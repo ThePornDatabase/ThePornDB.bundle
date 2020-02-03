@@ -6,8 +6,8 @@ import json
 from dateutil.parser import parse
 import pprint
 
-API_SEARCH_URL = 'http://metadataapi.net/api/scenes?parse=%s' 
-API_SCENE_URL = 'http://metadataapi.net/api/scenes/%s'
+API_SEARCH_URL = 'http://master.metadataapi.net/api/scenes?parse=%s' 
+API_SCENE_URL = 'http://master.metadataapi.net/api/scenes/%s'
 
 def any(s):
     for v in s:
@@ -55,7 +55,10 @@ class ThePornDBAgent(Agent.Movies):
         if media.primary_metadata is not None:
             year = media.primary_metadata.year
 
-        uri = (API_SEARCH_URL % (title.replace(' ', '.'))) 
+        uri = (API_SEARCH_URL % (media.filename.replace(' ', '.'))) 
+        if media.openSubtitlesHash:
+            uri += '&hash=' + media.openSubtitlesHash
+
         Log(uri)
         try:
 		    json_obj = GetJSON(uri)
@@ -70,6 +73,7 @@ class ThePornDBAgent(Agent.Movies):
     def update(self, metadata, media, lang):
         uri = (API_SCENE_URL % metadata.id) 
         Log(uri)
+        
         try:
 		    json_obj = GetJSON(uri)
         except:
