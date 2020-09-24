@@ -6,8 +6,8 @@ import json
 from dateutil.parser import parse
 import pprint
 
-API_SEARCH_URL = 'https://master.metadataapi.net/api/scenes?parse=%s' 
-API_SCENE_URL = 'https://master.metadataapi.net/api/scenes/%s'
+API_SEARCH_URL = 'https://api.metadataapi.net/scenes?parse=%s' 
+API_SCENE_URL = 'https://api.metadataapi.net/scenes/%s'
 
 def any(s):
     for v in s:
