@@ -16,5 +16,5 @@
 		"label": "Title format",
 		"type": "text",
 		"default": "{actors} - {title} [{studio}/{series}]"
-	},
+	}
 ]
