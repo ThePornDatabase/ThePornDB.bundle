@@ -1,5 +1,5 @@
 import re
-import json
+import urllib
 from dateutil.parser import parse
 
 API_SEARCH_URL = 'https://api.metadataapi.net/scenes?parse=%s&hash=%s'
@@ -50,9 +50,8 @@ class ThePornDBAgent(Agent.Movies):
             openHash = media.openSubtitlesHash
 
         if media.filename:
-            uri = API_SEARCH_URL % (media.filename.replace(' ', '.'), openHash)
+            uri = API_SEARCH_URL % (media.filename, openHash)
 
-            Log(uri)
             try:
                 json_obj = GetJSON(uri)
             except:
@@ -63,9 +62,8 @@ class ThePornDBAgent(Agent.Movies):
                     name = release['site']['name'] + ': ' + release['title']
                     results.Append(MetadataSearchResult(id=release['id'], name=name, year=release['date'], lang='en', score=100))
 
-        uri = API_SEARCH_URL % (title, openHash)
+        uri = API_SEARCH_URL % (urllib.quote(title), openHash)
 
-        Log(uri)
         try:
             json_obj = GetJSON(uri)
         except:
@@ -80,7 +78,6 @@ class ThePornDBAgent(Agent.Movies):
 
     def update(self, metadata, media, lang):
         uri = API_SCENE_URL % metadata.id
-        Log(uri)
 
         try:
             json_obj = GetJSON(uri)
