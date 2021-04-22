@@ -88,7 +88,7 @@ class ThePornDBAgent(Agent.Movies):
             json_obj = None
 
         if json_obj:
-            metadata.title = json_obj['data']['site']['name'] + ': ' + json_obj['data']['title']
+            metadata.title = json_obj['data']['title']
             metadata.studio = json_obj['data']['site']['name']
             metadata.summary = json_obj['data']['description']
             # metadata.tagline = json_obj['data']['site']['name']
@@ -118,6 +118,18 @@ class ThePornDBAgent(Agent.Movies):
             date_object = parse(json_obj['data']['date'])
             metadata.originally_available_at = date_object
             metadata.year = metadata.originally_available_at.year
+
+            if Prefs['custom_title_enable']:
+                data = {
+                    'title': metadata.title,
+                    'actors': ', '.join([actor.name.encode('ascii', 'ignore') for actor in metadata.roles]),
+                    'studio': metadata.studio,
+                    'series': ', '.join(set([collection.encode('ascii', 'ignore') for collection in metadata.collections if collection not in metadata.studio])),
+                }
+
+                metadata.title = Prefs['custom_title'].format(**data)
+
+        return metadata
 
 
 def getSearchTitle(title):
