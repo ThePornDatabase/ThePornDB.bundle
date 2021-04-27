@@ -75,7 +75,7 @@ Create a Movie Library
 - Input your API Token in the Personal API Key box
 - Select any other options and save your changes
 
-> For a successful match to your videos, filenames should be in the format ???-???-???-???
+> For a successful match to your videos, filenames should be in the format Site YYYY-MM-DD Title (The date is the most important part)
 
 
 
