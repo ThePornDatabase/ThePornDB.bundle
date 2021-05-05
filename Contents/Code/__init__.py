@@ -2,8 +2,10 @@ import re
 import urllib
 from dateutil.parser import parse
 
-API_SEARCH_URL = 'https://api.metadataapi.net/scenes?parse=%s&hash=%s'
-API_SCENE_URL = 'https://api.metadataapi.net/scenes/%s'
+API_BASE_URL = 'https://api.metadataapi.net'
+API_SEARCH_URL = API_BASE_URL + '/scenes?parse=%s&hash=%s'
+API_SCENE_URL = API_BASE_URL + '/scenes/%s'
+API_SITE_URL = API_BASE_URL + '/sites/%s'
 
 
 def Start():
@@ -19,12 +21,11 @@ def ValidatePrefs():
 
 def GetJSON(url):
     http_headers = {
-        'Authorization': '',
-        'User-agent': 'ThePornDB.bundle'
+        'User-agent': 'ThePornDB.bundle',
     }
 
     if Prefs['personal_api_key']:
-        http_headers['Authorization'] = 'Bearer ' + Prefs['personal_api_key']
+        http_headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
 
     return JSON.ObjectFromURL(url, headers=http_headers, sleep=1.0)
 
@@ -36,21 +37,18 @@ class ThePornDBAgent(Agent.Movies):
     primary_provider = True
 
     def search(self, results, media, lang):
-        title = getSearchTitle(media.name)
-
-        Log('*******MEDIA TITLE****** ' + str(title))
-
-        # Search for year
-        year = media.year
-        if media.primary_metadata is not None:
-            year = media.primary_metadata.year
-
         openHash = None
-        if media.openSubtitlesHash:
+        if media.openSubtitlesHash and Prefs['oshash_matching_enable']:
             openHash = media.openSubtitlesHash
 
+        searchResults = []
         if media.filename:
-            uri = API_SEARCH_URL % (media.filename, openHash)
+            filepath = urllib.unquote(media.filename)
+            if Prefs['filepath_cleanup_enable']:
+                filepath = re.sub(Prefs['filepath_cleanup'], '', filepath)
+
+            Log('[TPDB Agent] Searching: `%s`' % filepath)
+            uri = API_SEARCH_URL % (urllib.quote(filepath), openHash)
 
             try:
                 json_obj = GetJSON(uri)
@@ -58,21 +56,31 @@ class ThePornDBAgent(Agent.Movies):
                 json_obj = None
 
             if json_obj:
-                for release in json_obj['data']:
-                    name = release['site']['name'] + ': ' + release['title']
-                    results.Append(MetadataSearchResult(id=release['id'], name=name, year=release['date'], lang='en', score=100))
+                searchResults = json_obj['data']
+        elif Prefs['match_by_name_enable']:
+            title = media.name
 
-        uri = API_SEARCH_URL % (urllib.quote(title), openHash)
+            Log('[TPDB Agent] Searching: `%s`' % title)
+            uri = API_SEARCH_URL % (urllib.quote(title), openHash)
 
-        try:
-            json_obj = GetJSON(uri)
-        except:
-            json_obj = None
+            try:
+                json_obj = GetJSON(uri)
+            except:
+                json_obj = None
 
-        if json_obj:
-            for release in json_obj['data']:
-                name = release['site']['name'] + ': ' + release['title']
-                results.Append(MetadataSearchResult(id=release['id'], name=name, year=release['date'], lang='en', score=50))
+            if json_obj:
+                searchResults = json_obj['data']
+
+        if searchResults:
+            score = 100
+            for searchResult in searchResults:
+                id = '%d' % searchResult['_id']
+                name = '%s: %s' % (searchResult['site']['name'], searchResult['title'])
+                date = parse(searchResult['date'])
+                year = date.year if date else None
+                score = score - 1
+
+                results.Append(MetadataSearchResult(id=id, name=name, year=year, lang='en', score=score))
 
         return results
 
@@ -85,36 +93,57 @@ class ThePornDBAgent(Agent.Movies):
             json_obj = None
 
         if json_obj:
-            metadata.title = json_obj['data']['title']
-            metadata.studio = json_obj['data']['site']['name']
-            metadata.summary = json_obj['data']['description']
-            # metadata.tagline = json_obj['data']['site']['name']
+            scene_data = json_obj['data']
+            metadata.content_rating = 'XXX'
 
+            metadata.title = scene_data['title']
+            metadata.studio = scene_data['site']['name']
+            metadata.summary = scene_data['description']
+            # metadata.tagline = scene_data['site']['name']
+
+            date_object = parse(scene_data['date'])
+            if date_object:
+                metadata.originally_available_at = date_object
+                metadata.year = metadata.originally_available_at.year
+
+            # Collections
             metadata.collections.clear()
-            metadata.collections.add(json_obj['data']['site']['name'])
+            collections = [scene_data['site']['name']]
+
+            site_id = scene_data['site']['id']
+            network_id = scene_data['site']['network_id']
+            if site_id != network_id:
+                uri = API_SITE_URL % network_id
+
+                try:
+                    site_data = GetJSON(uri)
+                except:
+                    site_data = None
+
+                if site_data:
+                    site_data = site_data['data']
+                    collections.append(site_data['name'])
+
+            for collection in collections:
+                metadata.collections.add(collection)
 
             # Genres
             metadata.genres.clear()
-            if 'tags' in json_obj['data']:
-                for tag in json_obj['data']['tags']:
-                    metadata.genres.add(tag['tag'])
+            if 'tags' in scene_data:
+                for tag in scene_data['tags']:
+                    metadata.genres.add(tag['name'])
 
             # Actors
             metadata.roles.clear()
-            for performer in json_obj['data']['performers']:
+            for performer in scene_data['performers']:
                 role = metadata.roles.new()
                 # role.role = performer['name']
                 role.name = performer['name']
                 role.photo = performer['image']
                 Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
 
-            metadata.posters[json_obj['data']['posters']['large']] = Proxy.Media(HTTP.Request(json_obj['data']['posters']['large']).content)
-            metadata.art[json_obj['data']['background']['large']] = Proxy.Media(HTTP.Request(json_obj['data']['background']['large']).content)
-            metadata.content_rating = 'XXX'
-
-            date_object = parse(json_obj['data']['date'])
-            metadata.originally_available_at = date_object
-            metadata.year = metadata.originally_available_at.year
+            metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
+            metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
 
             if Prefs['custom_title_enable']:
                 data = {
@@ -127,19 +156,3 @@ class ThePornDBAgent(Agent.Movies):
                 metadata.title = Prefs['custom_title'].format(**data)
 
         return metadata
-
-
-def getSearchTitle(title):
-    trashTitle = (
-        'RARBG', 'COM', r'\d{3,4}x\d{3,4}', 'HEVC', r'H\d{3}', 'AVC', r'\dK',
-        r'\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4', 'KLEENEX', 'SD', 'HD',
-        'KTR', 'IEVA', 'WRB', 'NBQ', 'ForeverAloneDude', r'X\d{3}', 'SoSuMi',
-    )
-
-    title = re.sub(r'[^a-zA-Z0-9#&, ]', ' ', title)
-    for trash in trashTitle:
-        title = re.sub(r'\b%s\b' % trash, '', title, flags=re.IGNORECASE)
-
-    title = ' '.join(title.split())
-
-    return title

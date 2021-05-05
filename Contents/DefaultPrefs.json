@@ -16,5 +16,29 @@
 		"label": "Title format",
 		"type": "text",
 		"default": "{actors} - {title} [{studio}/{series}]"
+	},
+    {
+		"id": "oshash_matching_enable",
+		"label": "Use Matching by OpenSubtitleHash",
+		"type": "bool",
+		"default": "true"
+	},
+    {
+		"id": "match_by_name_enable",
+		"label": "Use Search by name",
+		"type": "bool",
+		"default": "true"
+	},
+    {
+		"id": "filepath_cleanup_enable",
+		"label": "Use FilePath cleanup",
+		"type": "bool",
+		"default": "false"
+	},
+	{
+		"id": "filepath_cleanup",
+		"label": "FilePath cleanup RegExp",
+		"type": "text",
+		"default": ""
 	}
 ]
