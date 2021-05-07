@@ -27,7 +27,7 @@ def GetJSON(url):
     if Prefs['personal_api_key']:
         http_headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
 
-    return JSON.ObjectFromURL(url, headers=http_headers, sleep=1.0)
+    return JSON.ObjectFromURL(url, headers=http_headers)
 
 
 class ThePornDBAgent(Agent.Movies):
