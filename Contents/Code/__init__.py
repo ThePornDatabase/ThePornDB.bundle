@@ -73,13 +73,11 @@ class ThePornDBAgent(Agent.Movies):
 
         if searchResults:
             score = 100
-            name = searchResult['title']
-            if 'site' in searchResult and searchResult['site']:
-                name = '%s: %s' % (searchResult['site']['name'], searchResult['title'])
-
             for searchResult in searchResults:
                 id = '%d' % searchResult['_id']
-                name = name
+                name = searchResult['title']
+                if 'site' in searchResult and searchResult['site']:
+                    name = '%s: %s' % (searchResult['site']['name'], searchResult['title'])
                 date = parse(searchResult['date'])
                 year = date.year if date else None
                 score = score - 1
@@ -101,7 +99,7 @@ class ThePornDBAgent(Agent.Movies):
             metadata.content_rating = 'XXX'
 
             metadata.title = scene_data['title']
-            if 'site' in searchResult and searchResult['site']:
+            if 'site' in scene_data and scene_data['site']:
                 metadata.studio = scene_data['site']['name']
             metadata.summary = scene_data['description']
             # metadata.tagline = scene_data['site']['name']
@@ -115,7 +113,7 @@ class ThePornDBAgent(Agent.Movies):
             metadata.collections.clear()
             collections = []
 
-            if 'site' in searchResult and searchResult['site']:
+            if 'site' in scene_data and scene_data['site']:
                 collections.append(scene_data['site']['name'])
 
                 site_id = scene_data['site']['id']
