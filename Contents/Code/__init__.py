@@ -27,7 +27,7 @@ def GetJSON(url):
     if Prefs['personal_api_key']:
         http_headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
 
-    return JSON.ObjectFromURL(url, headers=http_headers, sleep=1.0)
+    return JSON.ObjectFromURL(url, headers=http_headers)
 
 
 class ThePornDBAgent(Agent.Movies):
@@ -75,7 +75,9 @@ class ThePornDBAgent(Agent.Movies):
             score = 100
             for searchResult in searchResults:
                 id = '%d' % searchResult['_id']
-                name = '%s: %s' % (searchResult['site']['name'], searchResult['title'])
+                name = searchResult['title']
+                if 'site' in searchResult and searchResult['site']:
+                    name = '%s: %s' % (searchResult['site']['name'], searchResult['title'])
                 date = parse(searchResult['date'])
                 year = date.year if date else None
                 score = score - 1
@@ -97,7 +99,8 @@ class ThePornDBAgent(Agent.Movies):
             metadata.content_rating = 'XXX'
 
             metadata.title = scene_data['title']
-            metadata.studio = scene_data['site']['name']
+            if 'site' in scene_data and scene_data['site']:
+                metadata.studio = scene_data['site']['name']
             metadata.summary = scene_data['description']
             # metadata.tagline = scene_data['site']['name']
 
@@ -108,21 +111,24 @@ class ThePornDBAgent(Agent.Movies):
 
             # Collections
             metadata.collections.clear()
-            collections = [scene_data['site']['name']]
+            collections = []
 
-            site_id = scene_data['site']['id']
-            network_id = scene_data['site']['network_id']
-            if site_id != network_id:
-                uri = API_SITE_URL % network_id
+            if 'site' in scene_data and scene_data['site']:
+                collections.append(scene_data['site']['name'])
 
-                try:
-                    site_data = GetJSON(uri)
-                except:
-                    site_data = None
+                site_id = scene_data['site']['id']
+                network_id = scene_data['site']['network_id']
+                if site_id != network_id:
+                    uri = API_SITE_URL % network_id
 
-                if site_data:
-                    site_data = site_data['data']
-                    collections.append(site_data['name'])
+                    try:
+                        site_data = GetJSON(uri)
+                    except:
+                        site_data = None
+
+                    if site_data:
+                        site_data = site_data['data']
+                        collections.append(site_data['name'])
 
             for collection in collections:
                 metadata.collections.add(collection)
