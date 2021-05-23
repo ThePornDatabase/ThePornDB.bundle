@@ -118,7 +118,7 @@ class ThePornDBAgent(Agent.Movies):
 
                 site_id = scene_data['site']['id']
                 network_id = scene_data['site']['network_id']
-                if site_id != network_id:
+                if network_id and site_id != network_id:
                     uri = API_SITE_URL % network_id
 
                     try:
