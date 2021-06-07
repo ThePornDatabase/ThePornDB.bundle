@@ -33,7 +33,7 @@ def GetJSON(url):
 class ThePornDBAgent(Agent.Movies):
     name = 'ThePornDB'
     languages = [Locale.Language.English]
-    accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda']
+    accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
     primary_provider = True
 
     def search(self, results, media, lang):
