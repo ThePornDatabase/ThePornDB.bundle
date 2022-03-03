@@ -46,7 +46,7 @@ class ThePornDBAgent(Agent.Movies):
             open_hash = media.openSubtitlesHash
 
         title = media.name
-        if media.filename:
+        if media.filename and Prefs['match_by_filepath_enable']:
             title = urllib.unquote(media.filename)
             if Prefs['filepath_cleanup_enable'] and Settings.re_filepath_cleanup:
                 title = Settings.re_filepath_cleanup.sub('', title)

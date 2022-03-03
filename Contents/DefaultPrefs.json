@@ -24,6 +24,12 @@
         "default": "true"
     },
     {
+        "id": "match_by_filepath_enable",
+        "label": "Use FilePath for search if available",
+        "type": "bool",
+        "default": "false"
+    },
+    {
         "id": "filepath_cleanup_enable",
         "label": "Use FilePath cleanup",
         "type": "bool",
