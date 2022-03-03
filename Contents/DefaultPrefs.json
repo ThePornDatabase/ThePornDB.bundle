@@ -24,12 +24,6 @@
         "default": "true"
     },
     {
-        "id": "match_by_name_enable",
-        "label": "Use Search by name",
-        "type": "bool",
-        "default": "true"
-    },
-    {
         "id": "filepath_cleanup_enable",
         "label": "Use FilePath cleanup",
         "type": "bool",
