@@ -11,23 +11,27 @@ API_SITE_URL = API_BASE_URL + '/sites/%s'
 def Start():
     HTTP.ClearCache()
     HTTP.CacheTime = CACHE_1MINUTE * 20
-    HTTP.Headers['User-agent'] = 'ThePornDB.bundle'
+    HTTP.Headers['User-Agent'] = 'ThePornDB.bundle'
     HTTP.Headers['Accept-Encoding'] = 'gzip'
 
 
 def ValidatePrefs():
-    Log('ValidatePrefs function call')
+    Settings.re_filepath_cleanup = re.compile(Prefs['filepath_cleanup'])
 
 
 def GetJSON(url):
-    http_headers = {
-        'User-agent': 'ThePornDB.bundle',
+    headers = {
+        'User-Agent': 'ThePornDB.bundle',
     }
 
     if Prefs['personal_api_key']:
-        http_headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
+        headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
 
-    return JSON.ObjectFromURL(url, headers=http_headers)
+    return JSON.ObjectFromURL(url, headers=headers)
+
+
+class Settings:
+    re_filepath_cleanup = re.compile(Prefs['filepath_cleanup'])
 
 
 class ThePornDBAgent(Agent.Movies):
@@ -37,31 +41,20 @@ class ThePornDBAgent(Agent.Movies):
     primary_provider = True
 
     def search(self, results, media, lang):
-        openHash = None
+        open_hash = ''
         if media.openSubtitlesHash and Prefs['oshash_matching_enable']:
-            openHash = media.openSubtitlesHash
+            open_hash = media.openSubtitlesHash
 
-        searchResults = []
-        if media.filename:
-            filepath = urllib.unquote(media.filename)
-            if Prefs['filepath_cleanup_enable']:
-                filepath = re.sub(Prefs['filepath_cleanup'], '', filepath)
+        title = media.name
+        if media.filename and Prefs['match_by_filepath_enable']:
+            title = urllib.unquote(media.filename)
+            if Prefs['filepath_cleanup_enable'] and Settings.re_filepath_cleanup:
+                title = Settings.re_filepath_cleanup.sub('', title)
 
-            Log('[TPDB Agent] Searching: `%s`' % filepath)
-            uri = API_SEARCH_URL % (urllib.quote(filepath), openHash)
-
-            try:
-                json_obj = GetJSON(uri)
-            except:
-                json_obj = None
-
-            if json_obj:
-                searchResults = json_obj['data']
-        elif Prefs['match_by_name_enable']:
-            title = media.name
-
+        search_results = []
+        if title:
             Log('[TPDB Agent] Searching: `%s`' % title)
-            uri = API_SEARCH_URL % (urllib.quote(title), openHash)
+            uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
 
             try:
                 json_obj = GetJSON(uri)
@@ -69,20 +62,19 @@ class ThePornDBAgent(Agent.Movies):
                 json_obj = None
 
             if json_obj:
-                searchResults = json_obj['data']
+                search_results = json_obj['data']
 
-        if searchResults:
-            score = 100
-            for searchResult in searchResults:
-                id = '%d' % searchResult['_id']
-                name = searchResult['title']
-                if 'site' in searchResult and searchResult['site']:
-                    name = '%s: %s' % (searchResult['site']['name'], searchResult['title'])
-                date = parse(searchResult['date'])
+        if search_results:
+            for idx, search_result in enumerate(search_results):
+                scene_id = search_result['id']
+                name = search_result['title']
+                if 'site' in search_result and search_result['site']:
+                    name = '%s: %s' % (search_result['site']['name'], search_result['title'])
+                date = parse(search_result['date'])
                 year = date.year if date else None
-                score = score - 1
+                score = 100 - idx
 
-                results.Append(MetadataSearchResult(id=id, name=name, year=year, lang='en', score=score))
+                results.Append(MetadataSearchResult(id=scene_id, name=name, year=year, lang='en', score=score))
 
         return results
 

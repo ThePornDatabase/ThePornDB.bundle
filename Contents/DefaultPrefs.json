@@ -24,10 +24,10 @@
         "default": "true"
     },
     {
-        "id": "match_by_name_enable",
-        "label": "Use Search by name",
+        "id": "match_by_filepath_enable",
+        "label": "Use FilePath for search if available",
         "type": "bool",
-        "default": "true"
+        "default": "false"
     },
     {
         "id": "filepath_cleanup_enable",
