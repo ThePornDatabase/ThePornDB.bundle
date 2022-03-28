@@ -16,7 +16,7 @@ def Start():
 
 
 def ValidatePrefs():
-    Settings.re_filepath_cleanup = re.compile(Prefs['filepath_cleanup'])
+    Log.Debug('ValidatePrefs')
 
 
 def GetJSON(url):
@@ -28,10 +28,6 @@ def GetJSON(url):
         headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
 
     return JSON.ObjectFromURL(url, headers=headers)
-
-
-class Settings:
-    re_filepath_cleanup = re.compile(Prefs['filepath_cleanup'])
 
 
 class ThePornDBAgent(Agent.Movies):
@@ -48,8 +44,8 @@ class ThePornDBAgent(Agent.Movies):
         title = media.name
         if media.filename and Prefs['match_by_filepath_enable']:
             title = urllib.unquote(media.filename)
-            if Prefs['filepath_cleanup_enable'] and Settings.re_filepath_cleanup:
-                title = Settings.re_filepath_cleanup.sub('', title)
+            if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
+                title = re.sub(Prefs['filepath_cleanup'], '', title)
 
         search_results = []
         if title:
