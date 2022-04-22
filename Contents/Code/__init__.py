@@ -34,6 +34,7 @@ class ThePornDBAgent(Agent.Movies):
     name = 'ThePornDB'
     languages = [Locale.Language.English]
     accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
+    contributes_to = ['com.plexapp.agents.none']
     primary_provider = True
 
     def search(self, results, media, lang):
