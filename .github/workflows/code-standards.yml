@@ -2,7 +2,7 @@ name: Code Standards
 on:
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   flake8-lint:
     runs-on: ubuntu-latest
