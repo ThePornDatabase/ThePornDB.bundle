@@ -12,6 +12,12 @@
         "default": "false"
     },
     {
+        "id": "collections_from_networks",
+        "label": "Collections from Networks",
+        "type": "bool",
+        "default": "true"
+    },
+    {
         "id": "custom_title",
         "label": "Title format",
         "type": "text",
