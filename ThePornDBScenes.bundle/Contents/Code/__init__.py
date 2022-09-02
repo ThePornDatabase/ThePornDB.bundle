@@ -30,8 +30,8 @@ def GetJSON(url):
     return JSON.ObjectFromURL(url, headers=headers)
 
 
-class ThePornDBAgent(Agent.Movies):
-    name = 'ThePornDB'
+class ThePornDBScenesAgent(Agent.Movies):
+    name = 'ThePornDB Scenes'
     languages = [Locale.Language.English]
     accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
     contributes_to = ['com.plexapp.agents.none']
