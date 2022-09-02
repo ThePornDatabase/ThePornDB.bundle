@@ -24,12 +24,6 @@
         "default": "false"
     },
     {
-        "id": "collections_from_networks",
-        "label": "Create Collection from Network Name",
-        "type": "bool",
-        "default": "false"
-    },
-    {
         "id": "oshash_matching_enable",
         "label": "Use Matching by OpenSubtitleHash",
         "type": "bool",

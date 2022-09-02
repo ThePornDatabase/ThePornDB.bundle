@@ -5,7 +5,6 @@ from dateutil.parser import parse
 API_BASE_URL = 'https://api.metadataapi.net'
 API_SEARCH_URL = API_BASE_URL + '/movies?q=%s&hash=%s'
 API_MOVIE_URL = API_BASE_URL + '/movies/%s'
-API_SITE_URL = API_BASE_URL + '/sites/%s'
 API_PERFORMER_URL = API_BASE_URL + '/performers/%s'
 INITIAL_SCORE = 100
 
@@ -123,21 +122,6 @@ class TPDBMoviesAgent(Agent.Movies):
             if 'site' in scene_data and scene_data['site']and Prefs['collections_from_site']:
                 if DEBUG: Log("Adding movie to collection: %s" % scene_data['site'])
                 collections.append(scene_data['site']['name'])
-
-                site_id = scene_data['site']['id']
-                network_id = scene_data['site']['network_id']
-                if network_id and site_id != network_id and Prefs['collections_from_networks']:
-                    uri = API_SITE_URL % network_id
-
-                    try:
-                        site_data = GetJSON(uri)
-                    except:
-                        site_data = None
-
-                    if site_data:
-                        site_data = site_data['data']
-                        if DEBUG: Log("Adding movie to studio collection: %s" % site_data['name'])
-                        collections.append(site_data['name'])
 
             for collection in collections:
                 metadata.collections.add(collection)
