@@ -14,6 +14,7 @@ if DEBUG:
 else:
   Log('Agent debug logging is disabled!')
 
+
 def Start():
     HTTP.ClearCache()
     HTTP.CacheTime = CACHE_1MINUTE * 20
@@ -65,15 +66,16 @@ class TPDBMoviesAgent(Agent.Movies):
 
             try:
                 json_obj = GetJSON(uri)
-            except:
+            except Exception:
                 json_obj = None
 
             if json_obj:
                 search_results = json_obj['data']
 
         if search_results:
-            if DEBUG: Log("Results Found:")
-            if DEBUG: Log(search_results)
+            if DEBUG:
+                Log("Results Found:")
+                Log(search_results)
 
             for search_result in search_results:
                 movie_id = search_result['id']
@@ -86,7 +88,7 @@ class TPDBMoviesAgent(Agent.Movies):
                 resultstring = "Result Found: {} {} ({})  Score: {}".format(str(movie_id), name, str(year), score)
                 Log(resultstring)
                 if score >= good_score:
-                    results.Append(MetadataSearchResult(id = str(movie_id), name = name, year = str(year), lang = 'en', score = score))
+                    results.Append(MetadataSearchResult(id=str(movie_id), name=name, year=str(year), lang='en', score=score))
 
         results.Sort('score', descending=True)
         return results
@@ -96,7 +98,7 @@ class TPDBMoviesAgent(Agent.Movies):
 
         try:
             json_obj = GetJSON(uri)
-        except:
+        except Exception:
             json_obj = None
 
         if json_obj:
@@ -119,8 +121,9 @@ class TPDBMoviesAgent(Agent.Movies):
             metadata.collections.clear()
             collections = []
 
-            if 'site' in scene_data and scene_data['site']and Prefs['collections_from_site']:
-                if DEBUG: Log("Adding movie to collection: %s" % scene_data['site'])
+            if 'site' in scene_data and scene_data['site'] and Prefs['collections_from_site']:
+                if DEBUG:
+                    Log("Adding movie to collection: %s" % scene_data['site'])
                 collections.append(scene_data['site']['name'])
 
             for collection in collections:
@@ -130,29 +133,32 @@ class TPDBMoviesAgent(Agent.Movies):
             metadata.genres.clear()
             if 'tags' in scene_data:
                 for tag in scene_data['tags']:
-                    if DEBUG: Log("Found movie tag: %s" % tag['name'])
+                    if DEBUG:
+                        Log("Found movie tag: %s" % tag['name'])
                     metadata.genres.add(tag['name'])
 
             # Actors
             metadata.roles.clear()
             for performer in scene_data['performers']:
                 role = metadata.roles.new()
-                performerSlug = performer['name']
-                performerSlug = performerSlug.lower().replace(" ", "-")
-                uri = API_PERFORMER_URL %performerSlug
+                performerslug = performer['name']
+                performerslug = performerslug.lower().replace(" ", "-")
+                uri = API_PERFORMER_URL % performerslug
                 try:
                     performer_data = GetJSON(uri)
-                except:
+                except Exception:
                     performer_data = None
 
                 if performer_data:
                     performer_data = performer_data['data']
                     # role.role = performer['name']
-                    if DEBUG: Log('Adding actor: %s' % role.name)
+                    if DEBUG:
+                        Log('Adding actor: %s' % role.name)
                     role.name = performer_data['name']
                     role.photo = performer_data['image']
                 else:
-                    if DEBUG: Log('Adding actor, but no image available: %s' % role.name)
+                    if DEBUG:
+                        Log('Adding actor, but no image available: %s' % role.name)
                     role.name = performer['name']
                 Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
 
