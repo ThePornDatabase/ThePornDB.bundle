@@ -77,18 +77,17 @@ class TPDBMoviesAgent(Agent.Movies):
                 Log("Results Found:")
                 Log(search_results)
 
-            for search_result in search_results:
+            for idx, search_result in enumerate(search_results):
                 movie_id = search_result['id']
                 name = search_result['title']
-                score = INITIAL_SCORE - Util.LevenshteinDistance(title.lower(), name.lower())
+                score = 100 - idx
                 if 'site' in search_result and search_result['site']:
                     name = '%s   [%s]' % (search_result['title'], search_result['site']['name'])
                 date = parse(search_result['date'])
                 year = date.year if date else None
                 resultstring = "Result Found: {} {} ({})  Score: {}".format(str(movie_id), name, str(year), score)
                 Log(resultstring)
-                if score >= good_score:
-                    results.Append(MetadataSearchResult(id=str(movie_id), name=name, year=str(year), lang='en', score=score))
+                results.Append(MetadataSearchResult(id=str(movie_id), name=name, year=str(year), lang='en', score=score))
 
         results.Sort('score', descending=True)
         return results
