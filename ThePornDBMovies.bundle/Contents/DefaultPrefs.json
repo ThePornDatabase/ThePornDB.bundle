@@ -1,0 +1,56 @@
+[
+    {
+        "id": "personal_api_key",
+        "label": "Personal API Key",
+        "type": "text",
+        "default": ""
+    },
+    {
+        "id": "good_score",
+        "label": "Scoring value to show results over.  Results containing the exact search term will always be shown (The score is an integer value, 100 for perfect match.  98 Default)",
+        "type": "text",
+        "default": "95"
+    },
+    {
+        "id": "use_back_image",
+        "label": "Use back image as background (if available)",
+        "type": "bool",
+        "default": "false"
+    },
+    {
+        "id": "collections_from_site",
+        "label": "Create Collection from Studio Name",
+        "type": "bool",
+        "default": "false"
+    },
+    {
+        "id": "oshash_matching_enable",
+        "label": "Use Matching by OpenSubtitleHash",
+        "type": "bool",
+        "default": "true"
+    },
+    {
+        "id": "match_by_filepath_enable",
+        "label": "Use FilePath for search if available",
+        "type": "bool",
+        "default": "false"
+    },
+    {
+        "id": "filepath_cleanup_enable",
+        "label": "Use FilePath cleanup",
+        "type": "bool",
+        "default": "false"
+    },
+    {
+        "id": "filepath_cleanup",
+        "label": "FilePath cleanup RegExp",
+        "type": "text",
+        "default": ""
+    },
+	{
+		"id":"debug",
+		"label":"Enable debug logging",
+		"type":"bool",
+		"default":"false"
+	}
+]

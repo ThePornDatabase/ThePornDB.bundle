@@ -41,8 +41,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 ### Key Features
- - Metadata Agent for adult movie scenes
- - Creates collection based on originating site
+ - Metadata Agents for adult movies and scenes
+ - Optionally creates collection based on originating site
  - Adds Genre tags
  - Adds Scene description
  - Adds Thumbnails for the Cast
@@ -63,19 +63,23 @@
 ### Installation
 - Download, unzip, and rename the Plug-In. If you need help follow [these](https://support.plex.tv/articles/201187656-how-do-i-manually-install-a-plugin/) instructions
 - The Plug-In can be found at: ``` https://github.com/ThePornDatabase/ThePornDB.bundle/archive/refs/heads/main.zip ```
+- Please note that the Plug-In/Archive that you download will have two .bundle directories included, one for 'Scenes' and one for 'Movies'
+  Either or both of these will need to be placed into your Plex Plug-In folder, not folder that houses them
 
 
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-Create a Movie Library
-- Add the folders that contain your Porn Scenes
+Create a Movie Library (one library for Movies and another for Scenes is recommended)
+- Add the folders that contain your associated adult media
 - Select ThePornDB Agent in the advanced tab
 - Input your API Token in the Personal API Key box
 - Select any other options and save your changes
 
-> For a successful match to your videos, filenames should be in the format Site YYYY-MM-DD Title (The date is the most important part)
+> For a successful match to your Scenes, filenames should be in the format Site YYYY-MM-DD Title (The date is the most important part)
+> For matching movies, try to limit filename as much as possible to the actual name of the movie.  Remove any 'release tags' as much as possible
+
 
 
 
