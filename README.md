@@ -5,7 +5,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/ThePornDatabase/ThePornDB.bundle">
-    <img src="logo.png" alt="Logo" width="200" height="100">
+    <img src="https://metadataapi.net/images/logo.png" alt="Logo" width="200" height="100">
   </a>
 
   <h3 align="center">Plex Metadata Plug-In</h3>
