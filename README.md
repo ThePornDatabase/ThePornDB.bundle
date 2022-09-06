@@ -92,7 +92,7 @@ See the [open issues](https://github.com/ThePornDatabase/ThePornDB.bundle/issues
 
 <!-- CONTRIBUTING -->
 ## Contributing
-- Join the [Discord](https://discord.gg/VnD6KJqF) server and collaborate
+- Join the [Discord](https://discord.gg/XpSGpaB) server and collaborate
 - [Donate](https://www.patreon.com/metadataapi/posts) to the project
 
 <!-- CONTACT -->
