@@ -5,7 +5,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/ThePornDatabase/ThePornDB.bundle">
-    <img src="logo.png" alt="Logo" width="200" height="100">
+    <img src="https://metadataapi.net/images/logo.png" alt="Logo" width="200" height="100">
   </a>
 
   <h3 align="center">Plex Metadata Plug-In</h3>
@@ -92,7 +92,7 @@ See the [open issues](https://github.com/ThePornDatabase/ThePornDB.bundle/issues
 
 <!-- CONTRIBUTING -->
 ## Contributing
-- Join the [Discord](https://discord.gg/VnD6KJqF) server and collaborate
+- Join the [Discord](https://discord.gg/XpSGpaB) server and collaborate
 - [Donate](https://www.patreon.com/metadataapi/posts) to the project
 
 <!-- CONTACT -->
