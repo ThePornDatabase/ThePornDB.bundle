@@ -47,6 +47,10 @@ class ThePornDBScenesAgent(Agent.Movies):
             title = urllib.unquote(media.filename)
             if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
                 title = re.sub(Prefs['filepath_cleanup'], '', title)
+        
+        if re.search(' ([sS]\d+[eE]\d+) ', title) or re.search(' ([sS]\d+[eE]\d+) ', title):
+            titlesearch = re.search('(.* [sS]\d+)([eE]\d+ .*)', title)
+            title = titlesearch.group(1) + ":" + titlesearch.group(2)
 
         search_results = []
         if title:
