@@ -10,9 +10,9 @@ INITIAL_SCORE = 100
 
 DEBUG = Prefs['debug']
 if DEBUG:
-  Log('Agent debug logging is enabled!')
+    Log('Agent debug logging is enabled!')
 else:
-  Log('Agent debug logging is disabled!')
+    Log('Agent debug logging is disabled!')
 
 
 def Start():
