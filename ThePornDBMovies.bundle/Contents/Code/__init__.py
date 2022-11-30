@@ -10,9 +10,9 @@ INITIAL_SCORE = 100
 
 DEBUG = Prefs['debug']
 if DEBUG:
-    Log('Agent debug logging is enabled!')
+  Log('Agent debug logging is enabled!')
 else:
-    Log('Agent debug logging is disabled!')
+  Log('Agent debug logging is disabled!')
 
 
 def Start():
@@ -160,9 +160,11 @@ class TPDBMoviesAgent(Agent.Movies):
                         Log('Adding actor, but no image available: %s' % role.name)
                     role.name = performer['name']
                 Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
-
-            metadata.posters[scene_data['front']] = Proxy.Media(HTTP.Request(scene_data['front']).content)
-            if scene_data['back'] and Prefs['use_back_image']:
-                metadata.art[scene_data['back']] = Proxy.Media(HTTP.Request(scene_data['back']).content)
+            if 'image' in scene_data:
+                if scene_data['image']:
+                    metadata.posters[scene_data['image']] = Proxy.Media(HTTP.Request(scene_data['image']).content)
+            if 'back' in scene_data:
+                if scene_data['back'] and Prefs['use_back_image']:
+                    metadata.art[scene_data['back']] = Proxy.Media(HTTP.Request(scene_data['back']).content)
 
         return metadata
