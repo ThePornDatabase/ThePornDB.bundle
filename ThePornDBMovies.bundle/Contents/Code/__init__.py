@@ -160,11 +160,13 @@ class TPDBMoviesAgent(Agent.Movies):
                         Log('Adding actor, but no image available: %s' % role.name)
                     role.name = performer['name']
                 Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
-            if 'image' in scene_data:
-                if scene_data['image']:
-                    metadata.posters[scene_data['image']] = Proxy.Media(HTTP.Request(scene_data['image']).content)
-            if 'back' in scene_data:
-                if scene_data['back'] and Prefs['use_back_image']:
-                    metadata.art[scene_data['back']] = Proxy.Media(HTTP.Request(scene_data['back']).content)
+
+            if 'large' in scene_data['posters']:
+                metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
+            else:
+                metadata.posters[scene_data['image']] = Proxy.Media(HTTP.Request(scene_data['image']).content)
+                
+            if 'large' in scene_data['background'] and Prefs['use_back_image']:
+                metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
 
         return metadata
