@@ -25,31 +25,25 @@
     },
     {
         "id": "oshash_matching_enable",
-        "label": "Use Matching by OpenSubtitleHash (Matches against file OSHASH)",
+        "label": "Use Matching by OpenSubtitleHash",
         "type": "bool",
         "default": "true"
     },
     {
         "id": "match_by_filepath_enable",
-        "label": "Use FilePath for search if available (Possibly broken with current Plex)",
+        "label": "Use FilePath for search if available",
         "type": "bool",
         "default": "false"
     },
     {
         "id": "filepath_cleanup_enable",
-        "label": "Use FilePath cleanup (Possibly broken with current Plex)",
+        "label": "Use FilePath cleanup",
         "type": "bool",
         "default": "false"
     },
     {
-        "id": "title_regex",
-        "label": "Regex to remove from title.  For example: '\[.*?\]' would remove everything between brackets in the filename.  Multiple terms can be separated by commas, and terms are case insensitive. Also remember that a space is a valid character, so don't put them after commas unless you mean to",
-        "type": "text",
-        "default": ""
-    },
-    {
         "id": "filepath_cleanup",
-        "label": "FilePath cleanup RegExp (Possibly broken with current Plex)",
+        "label": "FilePath cleanup RegExp",
         "type": "text",
         "default": ""
     }
