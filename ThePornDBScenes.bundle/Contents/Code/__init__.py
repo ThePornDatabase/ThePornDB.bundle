@@ -6,6 +6,7 @@ API_BASE_URL = 'https://api.metadataapi.net'
 API_SEARCH_URL = API_BASE_URL + '/scenes?q=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/scenes/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
+INITIAL_SCORE = 100
 
 
 def Start():
@@ -86,9 +87,10 @@ class ThePornDBScenesAgent(Agent.Movies):
                     name = '%s: %s' % (search_result['site']['name'], search_result['title'])
                 date = parse(search_result['date'])
                 year = date.year if date else None
-                score = 100 - idx
+                score = INITIAL_SCORE - Util.LevenshteinDistance(title.lower(), name.lower())
 
                 results.Append(MetadataSearchResult(id=scene_id, name=name, year=year, lang='en', score=score))
+            results.Sort('score', descending=True)
 
         return results
 
