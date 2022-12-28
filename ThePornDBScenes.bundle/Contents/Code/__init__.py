@@ -3,7 +3,7 @@ import urllib
 from dateutil.parser import parse
 
 API_BASE_URL = 'https://api.metadataapi.net'
-API_SEARCH_URL = API_BASE_URL + '/scenes?parse=%s&hash=%s'
+API_SEARCH_URL = API_BASE_URL + '/scenes?q=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/scenes/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
 
@@ -47,6 +47,24 @@ class ThePornDBScenesAgent(Agent.Movies):
             title = urllib.unquote(media.filename)
             if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
                 title = re.sub(Prefs['filepath_cleanup'], '', title)
+        
+        if re.search(' ([sS]\d+[eE]\d+) ', title) or re.search(' ([sS]\d+[eE]\d+) ?', title):
+            titlesearch = re.search('(.* [sS]\d+)([eE]\d+ ?.*)', title)
+            title = titlesearch.group(1) + ":" + titlesearch.group(2)
+        
+        if Prefs['title_regex']:
+            regexes = Prefs['title_regex'].split(",")
+            Log('[TPDB Agent] Regexes Passed: `%s`' % Prefs['title_regex'])
+            Log('[TPDB Agent] Title before Regex: `%s`' % title)
+            for regex in regexes:
+                try:
+                    regexcompile = re.compile(regex, re.IGNORECASE)
+                    if re.search(regexcompile, title):
+                        Log('[TPDB Agent] Stripping Regex from Title: `%s`' % regex)
+                        title = regexcompile.sub("", title).strip()
+                except re.error:
+                    Log('[TPDB Agent] Invalid Regex supplied: `%s`' % regex)
+            Log('[TPDB Agent] Title after Regex: `%s`' % title)
 
         search_results = []
         if title:
