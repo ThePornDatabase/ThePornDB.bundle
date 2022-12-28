@@ -39,7 +39,7 @@ class ThePornDBScenesAgent(Agent.Movies):
 
     def search(self, results, media, lang):
         open_hash = ''
-        if media.openSubtitlesHash and Prefs['oshash_matching_enable']:
+        if media.items[0].parts[0].openSubtitleHash and Prefs['oshash_matching_enable']:
             open_hash = media.items[0].parts[0].openSubtitleHash
         
         title = media.name
@@ -70,7 +70,6 @@ class ThePornDBScenesAgent(Agent.Movies):
         if title:
             Log('[TPDB Agent] Searching: `%s`' % title)
             uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
-
             try:
                 json_obj = GetJSON(uri)
             except:
