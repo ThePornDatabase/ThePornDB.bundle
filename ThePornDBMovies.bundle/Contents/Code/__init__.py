@@ -128,8 +128,6 @@ class TPDBMoviesAgent(Agent.Movies):
             metadata.genres.clear()
             if 'tags' in scene_data:
                 for tag in scene_data['tags']:
-                    if DEBUG:
-                        Log("Found movie tag: %s" % tag['name'])
                     metadata.genres.add(tag['name'])
 
             # Actors
