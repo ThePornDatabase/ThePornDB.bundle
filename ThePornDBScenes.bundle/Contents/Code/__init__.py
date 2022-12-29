@@ -157,26 +157,7 @@ class ThePornDBScenesAgent(Agent.Movies):
 
 def cleanup(text):
     text = urllib.unquote(text)
-    text = re.search(r'.*[\\/](.*)', text).group(1)
-    text = re.search(r'(.*)\.\w{3,4}', text).group(1)
-    if text and Prefs['match_by_filepath_enable']:
-        if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-            regexes = Prefs['filepath_cleanup'].split(",")
-            Log('[TPDB Agent] Regexes Passed: `%s`' % Prefs['filepath_cleanup'])
-            Log('[TPDB Agent] Title before Regex: `%s`' % text)
-            for regex in regexes:
-                try:
-                    regex_compile = re.compile(regex, re.IGNORECASE)
-                    if re.search(regex_compile, text):
-                        Log('[TPDB Agent] Stripping Regex from Title: `%s`' % regex)
-                        text = regex_compile.sub("", text).strip()
-                except re.error:
-                    Log('[TPDB Agent] Invalid Regex supplied: `%s`' % regex)
-            Log('[TPDB Agent] Title after Regex: `%s`' % text)
-
-    if Prefs['rewrite_season_episode']:
-        if re.search(r' ([sS]\d+[eE]\d+) ', text) or re.search(r' ([sS]\d+[eE]\d+) ?', text):
-            title_search = re.search(r'(.* [sS]\d+)([eE]\d+ ?.*)', text)
-            text = title_search.group(1) + ":" + title_search.group(2)
+    if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
+        text = re.sub(Prefs['filepath_cleanup'], '', text)
 
     return text

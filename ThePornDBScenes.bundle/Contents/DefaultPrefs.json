@@ -43,14 +43,8 @@
     },
     {
         "id": "filepath_cleanup",
-        "label": "Regex to remove from filepath.  For example: '\\[.*?\\]' would remove everything between brackets in the filename.  Multiple terms can be separated by commas, and terms are case insensitive. Also remember that a space is a valid character, so don't put them after commas unless you mean to.  ` - ,\\(.*?\\),\\[.*?\\]` (without quotes) will remove '<SPACE>-<SPACE>', THEN everything in (), THEN everything in []",
+        "label": "Regex to remove from filepath.  For example: '\\[.*?\\]' would remove everything between brackets in the filename. Also remember that a space is a valid character, so don't put them after commas unless you mean to.  ` - |\\(.*?\\)|\\[.*?\\]` (without quotes) will remove '<SPACE>-<SPACE>', THEN everything in (), THEN everything in []",
         "type": "text",
         "default": ""
-    },
-    {
-        "id": "rewrite_season_episode",
-        "label": "Cleanup S##E## naming, or try to.  Will rewrite S##E## as S##:E## instead for better matching",
-        "type": "bool",
-        "default": "false"
-    }    
+    }
 ]
