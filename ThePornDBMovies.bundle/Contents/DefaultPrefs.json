@@ -6,32 +6,32 @@
         "default": ""
     },
     {
-        "id": "good_score",
-        "label": "Scoring value to show results over.  Results containing the exact search term will always be shown (The score is an integer value, 100 for perfect match.  98 Default)",
+        "id": "custom_title_enable",
+        "label": "Use Custom Title Format",
+        "type": "bool",
+        "default": "false"
+    },
+    {
+        "id": "collections_from_networks",
+        "label": "Collections from Networks",
+        "type": "bool",
+        "default": "true"
+    },
+    {
+        "id": "custom_title",
+        "label": "Title format",
         "type": "text",
-        "default": "95"
-    },
-    {
-        "id": "use_back_image",
-        "label": "Use back image as background (if available)",
-        "type": "bool",
-        "default": "false"
-    },
-    {
-        "id": "collections_from_site",
-        "label": "Create Collection from Studio Name",
-        "type": "bool",
-        "default": "false"
+        "default": "{actors} - {title} [{studio}/{series}]"
     },
     {
         "id": "oshash_matching_enable",
-        "label": "Use Matching by OpenSubtitleHash",
+        "label": "Use Matching by OpenSubtitleHash (Matches against file OSHASH)",
         "type": "bool",
         "default": "true"
     },
     {
         "id": "match_by_filepath_enable",
-        "label": "Use FilePath for search if available",
+        "label": "Use Filename for search, will ignore the current title assigned in Plex",
         "type": "bool",
         "default": "false"
     },
@@ -43,14 +43,8 @@
     },
     {
         "id": "filepath_cleanup",
-        "label": "FilePath cleanup RegExp",
+        "label": "Regex to remove from filepath.  For example: '\\[.*?\\]' would remove everything between brackets in the filename.  Multiple terms can be separated by commas, and terms are case insensitive. Also remember that a space is a valid character, so don't put them after commas unless you mean to.  ` - ,\\(.*?\\),\\[.*?\\]` (without quotes) will remove '<SPACE>-<SPACE>', THEN everything in (), THEN everything in []",
         "type": "text",
         "default": ""
-    },
-	{
-		"id":"debug",
-		"label":"Enable debug logging",
-		"type":"bool",
-		"default":"false"
-	}
+    }
 ]

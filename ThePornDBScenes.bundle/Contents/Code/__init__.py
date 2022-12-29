@@ -6,13 +6,12 @@ API_BASE_URL = 'https://api.metadataapi.net'
 API_SEARCH_URL = API_BASE_URL + '/scenes?q=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/scenes/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
-INITIAL_SCORE = 100
 
 
 def Start():
     HTTP.ClearCache()
     HTTP.CacheTime = CACHE_1MINUTE * 20
-    HTTP.Headers['User-Agent'] = 'ThePornDB.bundle'
+    HTTP.Headers['User-Agent'] = 'ThePornDBScenes.bundle'
     HTTP.Headers['Accept-Encoding'] = 'gzip'
 
 
@@ -22,7 +21,7 @@ def ValidatePrefs():
 
 def GetJSON(url):
     headers = {
-        'User-Agent': 'ThePornDB.bundle',
+        'User-Agent': 'ThePornDBScenes.bundle',
     }
 
     if Prefs['personal_api_key']:
@@ -42,35 +41,16 @@ class ThePornDBScenesAgent(Agent.Movies):
         open_hash = ''
         if media.items[0].parts[0].openSubtitleHash and Prefs['oshash_matching_enable']:
             open_hash = media.items[0].parts[0].openSubtitleHash
-        
+
         title = media.name
-        filename = re.search('.*[\\\/](.*)', media.items[0].parts[0].file).group(1)
-        filename = re.search('(.*)\.\w{3,4}', filename).group(1)
-        if filename and Prefs['match_by_filepath_enable']:
-            title = urllib.unquote(filename)
-            if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-                regexes = Prefs['filepath_cleanup'].split(",")
-                Log('[TPDB Agent] Regexes Passed: `%s`' % Prefs['filepath_cleanup'])
-                Log('[TPDB Agent] Title before Regex: `%s`' % title)
-                for regex in regexes:
-                    try:
-                        regexcompile = re.compile(regex, re.IGNORECASE)
-                        if re.search(regexcompile, title):
-                            Log('[TPDB Agent] Stripping Regex from Title: `%s`' % regex)
-                            title = regexcompile.sub("", title).strip()
-                    except re.error:
-                        Log('[TPDB Agent] Invalid Regex supplied: `%s`' % regex)
-                Log('[TPDB Agent] Title after Regex: `%s`' % title)                
-                
-        if Prefs['rewrite_season_episode']:
-            if re.search(' ([sS]\d+[eE]\d+) ', title) or re.search(' ([sS]\d+[eE]\d+) ?', title):
-                titlesearch = re.search('(.* [sS]\d+)([eE]\d+ ?.*)', title)
-                title = titlesearch.group(1) + ":" + titlesearch.group(2)
+        if media.filename and Prefs['match_by_filepath_enable']:
+            title = cleanup(media.filename)
 
         search_results = []
         if title:
             Log('[TPDB Agent] Searching: `%s`' % title)
             uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
+
             try:
                 json_obj = GetJSON(uri)
             except:
@@ -82,14 +62,17 @@ class ThePornDBScenesAgent(Agent.Movies):
         if search_results:
             for idx, search_result in enumerate(search_results):
                 scene_id = search_result['id']
+
                 name = search_result['title']
                 if 'site' in search_result and search_result['site']:
                     name = '%s: %s' % (search_result['site']['name'], search_result['title'])
+
                 date = parse(search_result['date'])
                 year = date.year if date else None
-                score = INITIAL_SCORE - Util.LevenshteinDistance(title.lower(), name.lower())
+                score = 100 - Util.LevenshteinDistance(title.lower(), name.lower())
 
                 results.Append(MetadataSearchResult(id=scene_id, name=name, year=year, lang='en', score=score))
+
             results.Sort('score', descending=True)
 
         return results
@@ -153,7 +136,7 @@ class ThePornDBScenesAgent(Agent.Movies):
                 role = metadata.roles.new()
                 # role.role = performer['name']
                 role.name = performer['name']
-                role.photo = performer['image']
+                role.photo = performer['face']
                 Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
 
             metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
@@ -170,3 +153,30 @@ class ThePornDBScenesAgent(Agent.Movies):
                 metadata.title = Prefs['custom_title'].format(**data)
 
         return metadata
+
+
+def cleanup(text):
+    text = urllib.unquote(text)
+    text = re.search(r'.*[\\/](.*)', text).group(1)
+    text = re.search(r'(.*)\.\w{3,4}', text).group(1)
+    if text and Prefs['match_by_filepath_enable']:
+        if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
+            regexes = Prefs['filepath_cleanup'].split(",")
+            Log('[TPDB Agent] Regexes Passed: `%s`' % Prefs['filepath_cleanup'])
+            Log('[TPDB Agent] Title before Regex: `%s`' % text)
+            for regex in regexes:
+                try:
+                    regex_compile = re.compile(regex, re.IGNORECASE)
+                    if re.search(regex_compile, text):
+                        Log('[TPDB Agent] Stripping Regex from Title: `%s`' % regex)
+                        text = regex_compile.sub("", text).strip()
+                except re.error:
+                    Log('[TPDB Agent] Invalid Regex supplied: `%s`' % regex)
+            Log('[TPDB Agent] Title after Regex: `%s`' % text)
+
+    if Prefs['rewrite_season_episode']:
+        if re.search(r' ([sS]\d+[eE]\d+) ', text) or re.search(r' ([sS]\d+[eE]\d+) ?', text):
+            title_search = re.search(r'(.* [sS]\d+)([eE]\d+ ?.*)', text)
+            text = title_search.group(1) + ":" + title_search.group(2)
+
+    return text
