@@ -3,7 +3,7 @@ import urllib
 from dateutil.parser import parse
 
 API_BASE_URL = 'https://api.metadataapi.net'
-API_SEARCH_URL = API_BASE_URL + '/movies?q=%s&hash=%s'
+API_SEARCH_URL = API_BASE_URL + '/movies?parse=%s&hash=%s'
 API_MOVIE_URL = API_BASE_URL + '/movies/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
 
