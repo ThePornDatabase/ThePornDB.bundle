@@ -3,7 +3,7 @@ import urllib
 from dateutil.parser import parse
 
 API_BASE_URL = 'https://api.metadataapi.net'
-API_SEARCH_URL = API_BASE_URL + '/scenes?q=%s&hash=%s'
+API_SEARCH_URL = API_BASE_URL + '/scenes?parse=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/scenes/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
 
@@ -158,6 +158,6 @@ class ThePornDBScenesAgent(Agent.Movies):
 def cleanup(text):
     text = urllib.unquote(text)
     if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-        text = re.sub(Prefs['filepath_cleanup'], '', text)
+        text = re.sub(Prefs['filepath_cleanup'], '', text, re.IGNORECASE)
 
     return text
