@@ -158,6 +158,6 @@ class ThePornDBScenesAgent(Agent.Movies):
 def cleanup(text):
     text = urllib.unquote(text)
     if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-        text = re.sub(Prefs['filepath_cleanup'], '', text)
+        text = re.sub(Prefs['filepath_cleanup'], '', text, re.IGNORECASE)
 
     return text
