@@ -134,8 +134,13 @@ class ThePornDBScenesAgent(Agent.Movies):
             metadata.roles.clear()
             for performer in scene_data['performers']:
                 role = metadata.roles.new()
-                # role.role = performer['name']
-                role.name = performer['name']
+
+                if 'parent' in performer:
+                    role.name = performer['parent']['name']
+                else:
+                    role.name = performer['name']
+
+                role.role = performer['name']
                 role.photo = performer['face']
                 Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
 
