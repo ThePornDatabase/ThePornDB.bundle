@@ -30,7 +30,7 @@ def GetJSON(url):
     return JSON.ObjectFromURL(url, headers=headers)
 
 
-class TPDBMoviesAgent(Agent.Movies):
+class ThePornDBMoviesAgent(Agent.Movies):
     name = 'ThePornDB Movies'
     languages = [Locale.Language.English]
     accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
@@ -135,7 +135,7 @@ class TPDBMoviesAgent(Agent.Movies):
             for performer in scene_data['performers']:
                 role = metadata.roles.new()
 
-                if 'parent' in performer:
+                if 'parent' in performer and performer['parent']:
                     role.name = performer['parent']['name']
                 else:
                     role.name = performer['name']
