@@ -135,7 +135,7 @@ class ThePornDBScenesAgent(Agent.Movies):
             for performer in scene_data['performers']:
                 role = metadata.roles.new()
 
-                if 'parent' in performer:
+                if 'parent' in performer and performer['parent']:
                     role.name = performer['parent']['name']
                 else:
                     role.name = performer['name']
