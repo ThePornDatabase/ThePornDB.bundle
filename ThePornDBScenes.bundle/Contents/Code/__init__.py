@@ -7,6 +7,7 @@ API_SEARCH_URL = API_BASE_URL + '/scenes?parse=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/scenes/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
 
+ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/scenes\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
 
 def Start():
     HTTP.ClearCache()
@@ -46,10 +47,15 @@ class ThePornDBScenesAgent(Agent.Movies):
         if media.filename and Prefs['match_by_filepath_enable']:
             title = cleanup(media.filename)
 
+        title_is_id = re.match(ID_REGEX,title)
+
         search_results = []
         if title:
             Log('[TPDB Agent] Searching: `%s`' % title)
-            uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
+            if title_is_id:
+                uri = API_SCENE_URL % (urllib.quote(title_is_id.group("id")))
+            else:
+                uri = API_SEARCH_URL % (urllib.quote(title), open_hash)                
 
             try:
                 json_obj = GetJSON(uri)
@@ -57,7 +63,7 @@ class ThePornDBScenesAgent(Agent.Movies):
                 json_obj = None
 
             if json_obj:
-                search_results = json_obj['data']
+                search_results = [json_obj['data']] if title_is_id else json_obj['data']
 
         if search_results:
             for idx, search_result in enumerate(search_results):
