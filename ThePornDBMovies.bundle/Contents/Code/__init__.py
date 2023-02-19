@@ -77,7 +77,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
                 year = date.year if date else None
                 score = 100 - Util.LevenshteinDistance(title.lower(), name.lower())
 
-                results.Append(MetadataSearchResult(id=str(movie_id), name=name, year=str(year), lang='en', score=score))
+                results.Append(MetadataSearchResult(id=movie_id, name=name, year=year, lang='en', score=score))
 
             results.Sort('score', descending=True)
 
