@@ -48,7 +48,7 @@ class ThePornDBScenesAgent(Agent.Movies):
         if media.filename and Prefs['match_by_filepath_enable']:
             title = cleanup(media.filename)
 
-        title_is_id = re.match(ID_REGEX,title)
+        title_is_id = re.match(ID_REGEX, title)
 
         search_results = []
         if title:
