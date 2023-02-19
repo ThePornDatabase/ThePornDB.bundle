@@ -77,7 +77,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
                 year = date.year if date else None
                 score = 100 - Util.LevenshteinDistance(title.lower(), name.lower())
 
-                results.Append(MetadataSearchResult(id=str(movie_id), name=name, year=str(year), lang='en', score=score))
+                results.Append(MetadataSearchResult(id=movie_id, name=name, year=year, lang='en', score=score))
 
             results.Sort('score', descending=True)
 
@@ -169,6 +169,6 @@ class ThePornDBMoviesAgent(Agent.Movies):
 def cleanup(text):
     text = urllib.unquote(text)
     if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-        text = re.sub(Prefs['filepath_cleanup'], '', text, re.IGNORECASE)
+        text = re.sub(Prefs['filepath_cleanup'], Prefs['filepath_replace'], text, re.IGNORECASE)
 
     return text
