@@ -9,6 +9,7 @@ API_SITE_URL = API_BASE_URL + '/sites/%s'
 
 ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/movies\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
 
+
 def Start():
     HTTP.ClearCache()
     HTTP.CacheTime = CACHE_1MINUTE * 20
@@ -55,7 +56,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
             if title_is_id:
                 uri = API_MOVIE_URL % (urllib.quote(title_is_id.group("id")))
             else:
-                uri = API_SEARCH_URL % (urllib.quote(title), open_hash)                   
+                uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
 
             try:
                 json_obj = GetJSON(uri)
