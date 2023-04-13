@@ -6,20 +6,37 @@
         "default": ""
     },
     {
+        "id": "collections_from_site",
+        "label": "Create Collection for Site Name",
+        "type": "bool",
+        "default": "true"
+    },    {
+        "id": "collections_from_networks",
+        "label": "Create Collection for Network Name",
+        "type": "bool",
+        "default": "true"
+    },
+    {
+        "id": "collection_site_prefix",
+        "label": "Prefix to Prepend to Site Name for Collections (Blank to Disable)",
+        "type": "text",
+        "default": "Site: "
+    },    
+	{
+        "id": "collection_network_prefix",
+        "label": "Prefix to Prepend to Network Name for Collections (Blank to Disable)",
+        "type": "text",
+        "default": "Network: "
+    },
+    {
         "id": "custom_title_enable",
         "label": "Use Custom Title Format",
         "type": "bool",
         "default": "false"
     },
-    {
-        "id": "collections_from_networks",
-        "label": "Collections from Networks",
-        "type": "bool",
-        "default": "true"
-    },
-    {
+	{
         "id": "custom_title",
-        "label": "Title format",
+        "label": "Title format (Tags Available: {title}, {actors}, {studio}, {series})",
         "type": "text",
         "default": "{actors} - {title} [{studio}/{series}]"
     },
@@ -34,10 +51,15 @@
         "label": "Use Filename for search, will ignore the current title assigned in Plex",
         "type": "bool",
         "default": "false"
+    },    {
+        "id": "filepath_strip_path_enable",
+        "label": "Strip file path and extension from searched filepath.  (Only for searching by filename)",
+        "type": "bool",
+        "default": "true"
     },
     {
         "id": "filepath_cleanup_enable",
-        "label": "Use FilePath cleanup",
+        "label": "Clean Filepath With Regex (Option Below)",
         "type": "bool",
         "default": "false"
     },
@@ -52,5 +74,10 @@
         "label": "Replace regex to ...",
         "type": "text",
         "default": ""
+    },    {
+        "id": "debug_logging",
+        "label": "Enable Debug logging",
+        "type": "bool",
+        "default": "false"
     }
 ]
