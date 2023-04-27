@@ -186,18 +186,20 @@ class ThePornDBScenesAgent(Agent.Movies):
                 role.photo = performer['face']
                 if debug: Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
 
-            metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
-            metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
-
             if Prefs['custom_title_enable']:
+                if debug: Log.Debug('[TPDB Agent] Using custom naming format: %s' % Prefs['custom_title'])
+
                 data = {
                     'title': metadata.title,
                     'actors': ', '.join([actor.name.encode('ascii', 'ignore') for actor in metadata.roles]),
                     'studio': metadata.studio,
                     'series': ', '.join(set([collection.encode('ascii', 'ignore') for collection in metadata.collections if collection not in metadata.studio])),
                 }
-
                 metadata.title = Prefs['custom_title'].format(**data)
+                if debug: Log.Debug('[TPDB Agent] Resulting Title: %s' % metadata.title)
+
+            metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
+            metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
 
         return metadata
 
