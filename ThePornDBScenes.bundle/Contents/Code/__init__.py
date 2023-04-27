@@ -198,8 +198,15 @@ class ThePornDBScenesAgent(Agent.Movies):
                 metadata.title = Prefs['custom_title'].format(**data)
                 if debug: Log.Debug('[TPDB Agent] Resulting Title: %s' % metadata.title)
 
-            metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
-            metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
+            try:
+                metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
+            except:
+                Log.Debug('[TPDB Agent] Unable to retrieve poster image from TPDB: %s' % scene_data['posters']['large'])
+
+            try:
+                metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
+            except:
+                Log.Debug('[TPDB Agent] Unable to retrieve background image from TPDB: %s' % scene_data['background']['large'])
 
         return metadata
 
