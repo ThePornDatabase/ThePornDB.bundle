@@ -6,6 +6,7 @@ API_BASE_URL = 'https://api.metadataapi.net'
 API_SEARCH_URL = API_BASE_URL + '/movies?parse=%s&hash=%s'
 API_MOVIE_URL = API_BASE_URL + '/movies/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
+API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=true'
 
 ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/movies\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
 
@@ -86,6 +87,9 @@ class ThePornDBMoviesAgent(Agent.Movies):
 
     def update(self, metadata, media, lang):
         uri = API_MOVIE_URL % metadata.id
+        
+        if Prefs['save_to_collection']:
+            uri = uri + API_ADD_TO_COLLECTION_QS_SUFFIX
 
         try:
             json_obj = GetJSON(uri)
