@@ -48,6 +48,10 @@ class ThePornDBMoviesAgent(Agent.Movies):
             open_hash = media.items[0].parts[0].openSubtitleHash
 
         title = media.name
+        if media.year:
+            search_year = str(media.year)
+        else:
+            search_year = ''
         if debug: Log.Debug('[TPDB Agent] Plex Title (Not Filename): %s' % title)
 
         if media.filename and Prefs['match_by_filepath_enable']:
@@ -64,7 +68,11 @@ class ThePornDBMoviesAgent(Agent.Movies):
 
         search_results = []
         if title:
-            Log('[TPDB Agent] Searching: `%s`' % title)
+            if search_year:
+                title = title + " " + search_year
+                Log('[TPDB Agent] Searching with Year: `%s`' % title)
+            else:
+                Log('[TPDB Agent] Searching: `%s`' % title)
             if title_is_id:
                 uri = API_MOVIE_URL % (urllib.quote(title_is_id.group("id")))
             else:
@@ -207,11 +215,11 @@ def cleanup(text):
         replacetext = Prefs['filepath_replace']
         if not replacetext:
             replacetext = ""
-        substrings = Prefs['filepath_cleanup'].split(",")
+        substrings = Prefs['filepath_cleanup'].split("|")
         if debug: Log.Debug('[TPDB Agent] Substitute string: %s' % Prefs['filepath_cleanup'])
         if debug: Log.Debug('[TPDB Agent] Substitute Title Text: %s' % text)
         for substring in substrings:
-            Log.Debug('[TPDB Agent] Subsitution Instance: %s' % substring)
+            Log.Debug('[TPDB Agent] Substitution Instance: %s' % substring)
             text = re.sub(substring, replacetext, text, re.IGNORECASE)
         text = text.replace("  ", " ").strip()
     if debug: Log.Debug('[TPDB Agent] Cleaned Title: %s' % text)
