@@ -69,14 +69,16 @@ class ThePornDBMoviesAgent(Agent.Movies):
         search_results = []
         if title:
             if search_year:
-                title = title + " " + search_year
-                Log('[TPDB Agent] Searching with Year: `%s`' % title)
+                search_query = title + " " + search_year
+                Log('[TPDB Agent] Searching with Year: `%s`' % search_query)
             else:
-                Log('[TPDB Agent] Searching: `%s`' % title)
+                search_query = title
+                Log('[TPDB Agent] Searching: `%s`' % search_query)
+
             if title_is_id:
                 uri = API_MOVIE_URL % (urllib.quote(title_is_id.group("id")))
             else:
-                uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
+                uri = API_SEARCH_URL % (urllib.quote(search_query), open_hash)
 
             try:
                 json_obj = GetJSON(uri)
