@@ -42,7 +42,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
     accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
     contributes_to = ['com.plexapp.agents.none']
     primary_provider = True
-    global debug
+
     debug = Prefs['debug_logging']
 
     def search(self, results, media, lang):
@@ -208,6 +208,12 @@ class ThePornDBMoviesAgent(Agent.Movies):
             if 'tags' in movie_data:
                 for tag in movie_data['tags']:
                     metadata.genres.add(tag['name'])
+
+                    if Prefs['CreateAllTagCollectionTags']:
+                        if self.debug:
+                            Log.Debug('Adding Tag Collection: ' + tag['name'])
+
+                        metadata.collections.add(tag['name'])
 
             # Actors
             metadata.roles.clear()

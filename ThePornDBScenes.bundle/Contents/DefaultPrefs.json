@@ -10,7 +10,8 @@
         "label": "Create Collection for Site Name",
         "type": "bool",
         "default": "true"
-    },    {
+    },
+    {
         "id": "collections_from_networks",
         "label": "Create Collection for Network Name",
         "type": "bool",

@@ -51,6 +51,7 @@ class ThePornDBScenesAgent(Agent.Movies):
             open_hash = media.items[0].parts[0].openSubtitleHash
 
         title = media.name
+        search_year = str(media.year) if media.year else ''
 
         if self.debug:
             Log.Debug('[TPDB Agent] Plex Title (Not Filename): %s' % title)
@@ -75,11 +76,17 @@ class ThePornDBScenesAgent(Agent.Movies):
 
         search_results = []
         if title:
-            Log('[TPDB Agent] Searching: `%s`' % title)
+            if search_year:
+                search_query = title + ' ' + search_year
+                Log('[TPDB Agent] Searching with Year: `%s`' % search_query)
+            else:
+                search_query = title
+                Log('[TPDB Agent] Searching: `%s`' % search_query)
+
             if title_is_id:
                 uri = API_SCENE_URL % (urllib.quote(title_is_id.group('id')))
             else:
-                uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
+                uri = API_SEARCH_URL % (urllib.quote(search_query), open_hash)
 
             try:
                 json_obj = GetJSON(uri)
