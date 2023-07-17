@@ -284,7 +284,7 @@ def cleanup(text, debug=False):
             Log.Debug('[TPDB Agent] Substitute Title Text: %s' % text)
 
         for substring in substrings:
-            Log.Debug('[TPDB Agent] Subsitution Instance: %s' % substring)
+            Log.Debug('[TPDB Agent] Substitution Instance: %s' % substring)
             text = re.sub(substring, replace_text, text, re.IGNORECASE)
 
         text = ' '.join(text.split())
