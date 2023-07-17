@@ -1,0 +1,25 @@
+import base64
+from urlparse import urlparse
+
+
+def MediaObjectsForURL(url):
+    url = urlparse(url)
+    url = url.path.split('/', 2)[-1]
+    url = base64.b64decode(url)
+
+    return [
+        MediaObject(
+            parts=[
+                PartObject(key=Callback(
+                    PlayVideo, url=url
+                ))
+            ],
+            audio_channels=2,
+            optimized_for_streaming=True
+        )
+    ]
+
+
+@indirect
+def PlayVideo(url):
+    return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url))

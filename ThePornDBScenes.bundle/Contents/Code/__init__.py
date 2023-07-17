@@ -1,3 +1,5 @@
+import base64
+import os
 import re
 import string
 import urllib
@@ -39,7 +41,7 @@ class ThePornDBScenesAgent(Agent.Movies):
     accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
     contributes_to = ['com.plexapp.agents.none']
     primary_provider = True
-    global debug
+
     debug = Prefs['debug_logging']
 
     def search(self, results, media, lang):
@@ -48,17 +50,25 @@ class ThePornDBScenesAgent(Agent.Movies):
             open_hash = media.items[0].parts[0].openSubtitleHash
 
         title = media.name
-        if debug: Log.Debug('[TPDB Agent] Plex Title (Not Filename): %s' % title)
+
+        if self.debug:
+            Log.Debug('[TPDB Agent] Plex Title (Not Filename): %s' % title)
 
         if media.filename and Prefs['match_by_filepath_enable']:
             if Prefs['filepath_strip_path_enable']:
-                if debug: Log.Debug('[TPDB Agent] Using Filename to Search')
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Using Filename to Search')
+
                 title = urllib.unquote(media.filename)
-                if debug: Log.Debug('[TPDB Agent] Stripping Path & Ext From: %s' % title)
-                title = re.sub('.*[\\\/]', '', title)
-                title = re.sub('\.\w{3,4}$', '', title)
-                if debug: Log.Debug('[TPDB Agent] Ending Search Title: %s' % title)
-            title = cleanup(title)
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Stripping Path & Ext From: %s' % title)
+
+                title = os.path.basename(title)
+                title = title.rsplit('.', 1)[0]
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Ending Search Title: %s' % title)
+
+            title = cleanup(title, self.debug)
 
         title_is_id = re.match(ID_REGEX, title)
 
@@ -66,7 +76,7 @@ class ThePornDBScenesAgent(Agent.Movies):
         if title:
             Log('[TPDB Agent] Searching: `%s`' % title)
             if title_is_id:
-                uri = API_SCENE_URL % (urllib.quote(title_is_id.group("id")))
+                uri = API_SCENE_URL % (urllib.quote(title_is_id.group('id')))
             else:
                 uri = API_SEARCH_URL % (urllib.quote(title), open_hash)
 
@@ -79,7 +89,9 @@ class ThePornDBScenesAgent(Agent.Movies):
                 search_results = [json_obj['data']] if title_is_id else json_obj['data']
 
         if search_results:
-            if debug: Log.Debug('[TPDB Agent] Search Results: %s' % search_results)
+            if self.debug:
+                Log.Debug('[TPDB Agent] Search Results: %s' % search_results)
+
             for idx, search_result in enumerate(search_results):
                 scene_id = search_result['id']
 
@@ -92,13 +104,17 @@ class ThePornDBScenesAgent(Agent.Movies):
 
                 # If the date is in the search string, remove it
                 title = title.lower()
-                if re.search('(\d{4}-\d{2}-\d{2})', title):
-                    title = re.sub('\d{4}-\d{2}-\d{2}', '', title)
-                title = title.replace("  ", " ").strip()
+                if re.search(r'(\d{4}-\d{2}-\d{2})', title):
+                    title = re.sub(r'\d{4}-\d{2}-\d{2}', '', title)
+
+                title = ' '.join(title.split())
 
                 score = 100 - Util.LevenshteinDistance(title, name.lower())
                 title = string.capwords(title)
-                if debug: Log('[TPDB Agent] Found Result: `%s` Site: `%s` (%i)' % (search_result['title'], search_result['site']['name'], score))
+
+                if self.debug:
+                    Log('[TPDB Agent] Found Result: `%s` Site: `%s` (%i)' % (search_result['title'], search_result['site']['name'], score))
+
                 results.Append(MetadataSearchResult(id=scene_id, name=name, year=year, lang='en', score=score))
 
             results.Sort('score', descending=True)
@@ -130,6 +146,15 @@ class ThePornDBScenesAgent(Agent.Movies):
                 metadata.originally_available_at = date_object
                 metadata.year = metadata.originally_available_at.year
 
+            if 'trailer' in scene_data and scene_data['trailer']:
+                trailer_url = 'tpdb://trailer/' + base64.b64encode(scene_data['trailer'])
+                trailer = TrailerObject(url=trailer_url, title='Trailer')
+
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Adding trailer: %s' % scene_data['trailer'])
+
+                metadata.extras.add(trailer)
+
             # Collections
             metadata.collections.clear()
             collections = []
@@ -140,7 +165,10 @@ class ThePornDBScenesAgent(Agent.Movies):
                         site_collection = Prefs['collection_site_prefix'] + scene_data['site']['name']
                     else:
                         site_collection = scene_data['site']['name']
-                    if debug: Log.Debug('[TPDB Agent] Writing Site Collection: %s' % site_collection)
+
+                    if self.debug:
+                        Log.Debug('[TPDB Agent] Writing Site Collection: %s' % site_collection)
+
                     collections.append(site_collection)
 
                 site_id = scene_data['site']['id']
@@ -159,11 +187,16 @@ class ThePornDBScenesAgent(Agent.Movies):
                             net_collection = Prefs['collection_network_prefix'] + site_data['name']
                         else:
                             net_collection = site_data['name']
-                        if debug: Log.Debug('[TPDB Agent] Writing Network Collection: %s' % net_collection)
+
+                        if self.debug:
+                            Log.Debug('[TPDB Agent] Writing Network Collection: %s' % net_collection)
+
                         collections.append(net_collection)
 
             for collection in collections:
-                if debug: Log.Debug('[TPDB Agent] Adding Collection: %s' % collection)
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Adding Collection: %s' % collection)
+
                 metadata.collections.add(collection)
 
             # Genres
@@ -184,10 +217,13 @@ class ThePornDBScenesAgent(Agent.Movies):
 
                 role.role = performer['name']
                 role.photo = performer['face']
-                if debug: Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
+
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Adding actor: %s' % role.name)
 
             if Prefs['custom_title_enable']:
-                if debug: Log.Debug('[TPDB Agent] Using custom naming format: %s' % Prefs['custom_title'])
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Using custom naming format: %s' % Prefs['custom_title'])
 
                 data = {
                     'title': metadata.title,
@@ -196,7 +232,9 @@ class ThePornDBScenesAgent(Agent.Movies):
                     'series': ', '.join(set([collection.encode('ascii', 'ignore') for collection in metadata.collections if collection not in metadata.studio])),
                 }
                 metadata.title = Prefs['custom_title'].format(**data)
-                if debug: Log.Debug('[TPDB Agent] Resulting Title: %s' % metadata.title)
+
+                if self.debug:
+                    Log.Debug('[TPDB Agent] Resulting Title: %s' % metadata.title)
 
             try:
                 metadata.posters[scene_data['posters']['large']] = Proxy.Media(HTTP.Request(scene_data['posters']['large']).content)
@@ -211,20 +249,30 @@ class ThePornDBScenesAgent(Agent.Movies):
         return metadata
 
 
-def cleanup(text):
+def cleanup(text, debug=False):
     text = urllib.unquote(text)
-    if debug: Log.Debug('[TPDB Agent] Cleanup text: %s' % text)
+    if debug:
+        Log.Debug('[TPDB Agent] Cleanup text: %s' % text)
+
     if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-        replacetext = Prefs['filepath_replace']
-        if not replacetext:
-            replacetext = ""
-        substrings = Prefs['filepath_cleanup'].split(",")
-        if debug: Log.Debug('[TPDB Agent] Substitute string: %s' % Prefs['filepath_cleanup'])
-        if debug: Log.Debug('[TPDB Agent] Substitute Title Text: %s' % text)
+        replace_text = Prefs['filepath_replace']
+        if not replace_text:
+            replace_text = ''
+        substrings = Prefs['filepath_cleanup'].split(',')
+
+        if debug:
+            Log.Debug('[TPDB Agent] Substitute string: %s' % Prefs['filepath_cleanup'])
+
+        if debug:
+            Log.Debug('[TPDB Agent] Substitute Title Text: %s' % text)
+
         for substring in substrings:
             Log.Debug('[TPDB Agent] Subsitution Instance: %s' % substring)
-            text = re.sub(substring, replacetext, text, re.IGNORECASE)
-        text = text.replace("  ", " ").strip()
-    if debug: Log.Debug('[TPDB Agent] Cleaned Title: %s' % text)
+            text = re.sub(substring, replace_text, text, re.IGNORECASE)
+
+        text = ' '.join(text.split())
+
+    if debug:
+        Log.Debug('[TPDB Agent] Cleaned Title: %s' % text)
 
     return text
