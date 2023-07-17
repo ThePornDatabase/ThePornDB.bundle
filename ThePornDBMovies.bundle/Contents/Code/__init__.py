@@ -158,7 +158,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
                 metadata.year = metadata.originally_available_at.year
 
             if 'trailer' in movie_data and movie_data['trailer']:
-                trailer_url = 'tpdb://trailer/' + base64.b64encode(movie_data['trailer'])
+                trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(movie_data['trailer'])
                 trailer = TrailerObject(url=trailer_url, title='Trailer')
 
                 if self.debug:
