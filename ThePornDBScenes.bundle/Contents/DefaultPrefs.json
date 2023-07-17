@@ -21,7 +21,7 @@
         "label": "Prefix to Prepend to Site Name for Collections (Blank to Disable)",
         "type": "text",
         "default": "Site: "
-    },    
+    },
 	{
         "id": "collection_network_prefix",
         "label": "Prefix to Prepend to Network Name for Collections (Blank to Disable)",
@@ -74,7 +74,14 @@
         "label": "Replace regex to ...",
         "type": "text",
         "default": ""
-    },    {
+    },
+    {
+        "id": "save_to_collection",
+        "label": "Enable Tagging Content as Collected",
+        "type": "bool",
+        "default": "false"
+    },
+    {
         "id": "debug_logging",
         "label": "Enable Debug logging",
         "type": "bool",
