@@ -51,6 +51,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
             open_hash = media.items[0].parts[0].openSubtitleHash
 
         title = media.name
+        search_year = str(media.year) if media.year else ''
 
         if self.debug:
             Log.Debug('[TPDB Agent] Plex Title (Not Filename): %s' % title)
@@ -75,7 +76,13 @@ class ThePornDBMoviesAgent(Agent.Movies):
 
         search_results = []
         if title:
-            Log('[TPDB Agent] Searching: `%s`' % title)
+            if search_year:
+                search_query = title + ' ' + search_year
+                Log('[TPDB Agent] Searching with Year: `%s`' % search_query)
+            else:
+                search_query = title
+                Log('[TPDB Agent] Searching: `%s`' % search_query)
+
             if title_is_id:
                 uri = API_MOVIE_URL % (urllib.quote(title_is_id.group('id')))
             else:
@@ -209,7 +216,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
                 for tag in movie_data['tags']:
                     metadata.genres.add(tag['name'])
 
-                    if Prefs['CreateAllTagCollectionTags']:
+                    if Prefs['create_all_tag_collection_tags']:
                         if self.debug:
                             Log.Debug('Adding Tag Collection: ' + tag['name'])
 

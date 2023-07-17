@@ -23,7 +23,13 @@
         "type": "text",
         "default": "Site: "
     },
-	{
+    {
+        "id": "create_all_tag_collection_tags",
+        "label": "Create Collections from ALL Tags/Genres",
+        "type": "bool",
+        "default": false
+    },
+    {
         "id": "collection_network_prefix",
         "label": "Prefix to Prepend to Network Name for Collections (Blank to Disable)",
         "type": "text",

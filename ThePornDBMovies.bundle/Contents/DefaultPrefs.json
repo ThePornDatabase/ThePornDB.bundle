@@ -12,16 +12,28 @@
         "default": "true"
     },
     {
+        "id": "collections_from_networks",
+        "label": "Create Collection for Network Name",
+        "type": "bool",
+        "default": "true"
+    },
+    {
         "id": "collection_site_prefix",
         "label": "Prefix to Prepend to Studio Name for Collections (Blank to Disable)",
         "type": "text",
         "default": "Studio: "
     },
     {
-        "id": "CreateAllTagCollectionTags",
+        "id": "create_all_tag_collection_tags",
         "label": "Create Collections from ALL Tags/Genres",
         "type": "bool",
         "default": false
+    },
+    {
+        "id": "collection_network_prefix",
+        "label": "Prefix to Prepend to Network Name for Collections (Blank to Disable)",
+        "type": "text",
+        "default": "Network: "
     },
     {
         "id": "custom_title_enable",

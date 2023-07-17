@@ -216,6 +216,12 @@ class ThePornDBScenesAgent(Agent.Movies):
                 for tag in scene_data['tags']:
                     metadata.genres.add(tag['name'])
 
+                    if Prefs['create_all_tag_collection_tags']:
+                        if self.debug:
+                            Log.Debug('Adding Tag Collection: ' + tag['name'])
+
+                        metadata.collections.add(tag['name'])
+
             # Actors
             metadata.roles.clear()
             for performer in scene_data['performers']:
