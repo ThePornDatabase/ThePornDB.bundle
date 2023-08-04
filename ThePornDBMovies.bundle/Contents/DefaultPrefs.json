@@ -51,7 +51,7 @@
         "id": "oshash_matching_enable",
         "label": "Use Matching by OpenSubtitleHash (Matches against file OSHASH)",
         "type": "bool",
-        "default": "true"
+        "default": "false"
     },
     {
         "id": "match_by_filepath_enable",

@@ -6,12 +6,12 @@ import urllib
 from dateutil.parser import parse
 
 API_BASE_URL = 'https://api.metadataapi.net'
-API_SEARCH_URL = API_BASE_URL + '/scenes?parse=%s&hash=%s'
-API_SCENE_URL = API_BASE_URL + '/scenes/%s'
+API_SEARCH_URL = API_BASE_URL + '/jav?parse=%s&hash=%s'
+API_SCENE_URL = API_BASE_URL + '/jav/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
 API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=true'
 
-ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/scenes\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
+ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/jav\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
 
 
 def Start():
@@ -27,7 +27,7 @@ def ValidatePrefs():
 
 def GetJSON(url):
     headers = {
-        'User-Agent': 'ThePornDBScenes.bundle',
+        'User-Agent': 'ThePornDBJAV.bundle',
     }
 
     if Prefs['personal_api_key']:
@@ -36,8 +36,8 @@ def GetJSON(url):
     return JSON.ObjectFromURL(url, headers=headers)
 
 
-class ThePornDBScenesAgent(Agent.Movies):
-    name = 'ThePornDB Scenes'
+class ThePornDBJAVAgent(Agent.Movies):
+    name = 'ThePornDB JAV'
     languages = [Locale.Language.English]
     accepts_from = ['com.plexapp.agents.localmedia', 'com.plexapp.agents.lambda', 'com.plexapp.agents.xbmcnfo']
     contributes_to = ['com.plexapp.agents.none']
