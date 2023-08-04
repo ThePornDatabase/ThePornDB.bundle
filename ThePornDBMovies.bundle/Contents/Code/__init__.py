@@ -218,7 +218,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
 
                     if Prefs['create_all_tag_collection_tags']:
                         if self.debug:
-                            Log.Debug('Adding Tag Collection: ' + tag['name'])
+                            Log.Debug('[TPDB Agent] Adding Tag Collection: ' + tag['name'])
 
                         metadata.collections.add(tag['name'])
 
