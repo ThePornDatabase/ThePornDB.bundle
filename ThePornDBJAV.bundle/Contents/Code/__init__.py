@@ -17,7 +17,7 @@ ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/jav\/)?(?P<id>[0-9a-z]{8}\-[
 def Start():
     HTTP.ClearCache()
     HTTP.CacheTime = CACHE_1MINUTE * 20
-    HTTP.Headers['User-Agent'] = 'ThePornDBScenes.bundle'
+    HTTP.Headers['User-Agent'] = 'ThePornDBJAV.bundle'
     HTTP.Headers['Accept-Encoding'] = 'gzip'
 
 
