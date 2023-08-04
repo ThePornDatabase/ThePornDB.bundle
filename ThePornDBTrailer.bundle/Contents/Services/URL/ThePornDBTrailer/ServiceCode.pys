@@ -1,0 +1,38 @@
+import base64
+from urlparse import urlparse
+
+
+def NormalizeURL(url):
+    return url
+
+
+def MetadataObjectForURL(url):
+     return VideoClipObject(
+        title='Trailer',
+    )
+
+
+def MediaObjectsForURL(url):
+    url = urlparse(url)
+    url = url.path.split('/', 2)[-1]
+    url = base64.urlsafe_b64decode(url)
+
+    if not url.startswith('http'):
+        return []
+
+    return [
+        MediaObject(
+            parts=[
+                PartObject(key=Callback(
+                    PlayVideo, url=url
+                ))
+            ],
+            optimized_for_streaming=True
+        )
+    ]
+
+
+@indirect
+def PlayVideo(url):
+    Log.Debug('[TPDB Trailer] Playing "%s"' % url)
+    return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url))
