@@ -259,9 +259,9 @@ class ThePornDBScenesAgent(Agent.Movies):
                 Log.Debug('[TPDB Agent] Unable to retrieve poster image from TPDB: %s' % scene_data['posters']['large'])
 
             try:
-                metadata.art[scene_data['background']['large']] = Proxy.Media(HTTP.Request(scene_data['background']['large']).content)
+                metadata.art[scene_data['background']['full']] = Proxy.Media(HTTP.Request(scene_data['background']['full']).content)
             except:
-                Log.Debug('[TPDB Agent] Unable to retrieve background image from TPDB: %s' % scene_data['background']['large'])
+                Log.Debug('[TPDB Agent] Unable to retrieve background image from TPDB: %s' % scene_data['background']['full'])
 
         return metadata
 
