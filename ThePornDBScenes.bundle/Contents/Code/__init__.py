@@ -158,13 +158,16 @@ class ThePornDBScenesAgent(Agent.Movies):
                 metadata.year = metadata.originally_available_at.year
 
             if 'trailer' in scene_data and scene_data['trailer']:
-                trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(scene_data['trailer'])
-                trailer = TrailerObject(url=trailer_url, title='Trailer')
+                if Prefs['import_trailer']:
+                    trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(scene_data['trailer'])
+                    trailer = TrailerObject(url=trailer_url, title='Trailer')
 
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Adding trailer: %s' % scene_data['trailer'])
+                    if self.debug:
+                        Log.Debug('[TPDB Agent] Adding trailer: %s' % scene_data['trailer'])
 
-                metadata.extras.add(trailer)
+                    metadata.extras.add(trailer)
+                else:
+                    Log.Debug('[TPDB Agent] Trailer available, but not imported due to user preferences')
 
             # Collections
             metadata.collections.clear()
