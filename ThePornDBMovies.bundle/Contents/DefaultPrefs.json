@@ -7,7 +7,7 @@
     },
     {
         "id": "collections_from_site",
-        "label": "Create Collection for Studio Name",
+        "label": "Create Collection for Site Name",
         "type": "bool",
         "default": "true"
     },
@@ -19,9 +19,9 @@
     },
     {
         "id": "collection_site_prefix",
-        "label": "Prefix to Prepend to Studio Name for Collections (Blank to Disable)",
+        "label": "Prefix to Prepend to Site Name for Collections (Blank to Disable)",
         "type": "text",
-        "default": "Studio: "
+        "default": "Site: "
     },
     {
         "id": "create_all_tag_collection_tags",
@@ -85,6 +85,12 @@
     {
         "id": "save_to_collection",
         "label": "Enable Tagging Content as Collected",
+        "type": "bool",
+        "default": "false"
+    },
+    {
+        "id": "import_trailer",
+        "label": "Import Trailer if Available",
         "type": "bool",
         "default": "false"
     },

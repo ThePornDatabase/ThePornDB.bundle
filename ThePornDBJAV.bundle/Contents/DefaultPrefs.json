@@ -89,6 +89,12 @@
         "default": "false"
     },
     {
+        "id": "import_trailer",
+        "label": "Import Trailer if Available",
+        "type": "bool",
+        "default": "false"
+    },
+    {
         "id": "debug_logging",
         "label": "Enable Debug logging",
         "type": "bool",
