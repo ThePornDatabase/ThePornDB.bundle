@@ -84,7 +84,7 @@ class ThePornDBMoviesAgent(Agent.Movies):
                 Log('[TPDB Agent] Searching: "%s"' % search_query)
 
             if title_is_id:
-                uri = API_SCENE_URL % (urllib.quote(title_is_id.group('id')))
+                uri = API_MOVIE_URL % (urllib.quote(title_is_id.group('id')))
             else:
                 uri = API_SEARCH_URL % (urllib.quote(search_query), open_hash)
 
