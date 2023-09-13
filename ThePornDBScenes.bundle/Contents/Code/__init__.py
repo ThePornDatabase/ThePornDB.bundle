@@ -1,39 +1,51 @@
+# -*- coding: utf-8 -*-
+
+
 import base64
-import os
-import re
-import string
-import urllib
 from dateutil.parser import parse
 
-API_BASE_URL = 'https://api.metadataapi.net'
-API_SEARCH_URL = API_BASE_URL + '/scenes?parse=%s&hash=%s'
-API_SCENE_URL = API_BASE_URL + '/scenes/%s'
-API_SITE_URL = API_BASE_URL + '/sites/%s'
-API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=true'
+from _utils import GetJSON, get_title_results, API_SCENE_URL, API_SITE_URL, API_ADD_TO_COLLECTION_QS_SUFFIX
+from _logging import log
 
-ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/scenes\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
+# plex debugging
+try:
+    import plexhints  # noqa: F401
+except ImportError:
+    pass
+else:  # the code is running outside of Plex
+    from plexhints.agent_kit import Agent, Media  # agent kit
+    from plexhints.core_kit import Core  # core kit
+    from plexhints.decorator_kit import handler, indirect, route  # decorator kit
+    from plexhints.exception_kit import Ex  # exception kit
+    from plexhints.locale_kit import Locale  # locale kit
+    from plexhints.log_kit import Log  # log kit
+    from plexhints.model_kit import Movie, VideoClip, VideoClipObject  # model kit
+    from plexhints.network_kit import HTTP  # network kit
+    from plexhints.object_kit import Callback, IndirectResponse, MediaObject, MessageContainer, MetadataItem, MetadataSearchResult, PartObject, SearchResult  # object kit
+    from plexhints.parse_kit import HTML, JSON, Plist, RSS, XML, YAML  # parse kit
+    from plexhints.prefs_kit import Prefs  # prefs kit
+    from plexhints.proxy_kit import Proxy  # proxy kit
+    from plexhints.resource_kit import Resource  # resource kit
+    from plexhints.shortcut_kit import L, E, D, R, S  # shortcut kit
+    from plexhints.util_kit import String, Util  # util kit
+
+    from plexhints.constant_kit import CACHE_1MINUTE, CACHE_1HOUR, CACHE_1DAY, CACHE_1WEEK, CACHE_1MONTH  # constant kit
+    from plexhints.constant_kit import ClientPlatforms, Protocols, OldProtocols, ServerPlatforms, ViewTypes, SummaryTextTypes, AudioCodecs, VideoCodecs, Containers, ContainerContents, StreamTypes  # constant kit, more commonly used in URL services
+
+    # extra objects
+    from plexhints.extras_kit import BehindTheScenesObject, ConcertVideoObject, DeletedSceneObject, FeaturetteObject, InterviewObject, LiveMusicVideoObject, LyricMusicVideoObject, MusicVideoObject, OtherObject, SceneOrSampleObject, ShortObject, TrailerObject
 
 
 def Start():
     HTTP.ClearCache()
-    HTTP.CacheTime = CACHE_1MINUTE * 20
+    HTTP.CacheTime = CACHE_1DAY
     HTTP.Headers['User-Agent'] = 'ThePornDBScenes.bundle'
     HTTP.Headers['Accept-Encoding'] = 'gzip'
+    log.separator(msg='ThePornDB Scenes Agent started.', log_level='info')
 
 
 def ValidatePrefs():
-    Log.Debug('ValidatePrefs')
-
-
-def GetJSON(url):
-    headers = {
-        'User-Agent': 'ThePornDBScenes.bundle',
-    }
-
-    if Prefs['personal_api_key']:
-        headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
-
-    return JSON.ObjectFromURL(url, headers=headers)
+    log.debug('ValidatePrefs called.')
 
 
 class ThePornDBScenesAgent(Agent.Movies):
@@ -43,95 +55,30 @@ class ThePornDBScenesAgent(Agent.Movies):
     contributes_to = ['com.plexapp.agents.none']
     primary_provider = True
 
-    debug = Prefs['debug_logging']
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def search(self, results, media, lang, manual=False):
+        log.separator(msg='Search Parameters', log_level='debug')
+        log.debug('[TPDB Agent] Media Title: "%s"' % media.title)
+        log.debug('[TPDB Agent] Media Name: "%s"' % media.name)
+        log.debug('[TPDB Agent] Media Year: "%s"' % media.year)
+        log.debug('[TPDB Agent] File: "%s"' % media.items[0].parts[0].file)
+        log.debug('[TPDB Agent] Filename: "%s"' % media.filename)
+        log.debug('[TPDB Agent] Language: "%s"' % lang)
+        log.debug('[TPDB Agent] Manual Search: "%s"' % manual)
+        log.separator(msg='', log_level='debug')
 
-    def search(self, results, media, lang):
-        open_hash = ''
-        if media.items[0].parts[0].openSubtitleHash and Prefs['oshash_matching_enable']:
-            open_hash = media.items[0].parts[0].openSubtitleHash
-
-        title = media.name
-        search_year = str(media.year) if media.year else ''
-
-        if self.debug:
-            Log.Debug('[TPDB Agent] Plex Title (Not Filename): "%s"' % title)
-
-        if media.filename and Prefs['match_by_filepath_enable']:
-            if Prefs['filepath_strip_path_enable']:
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Using Filename to Search')
-
-                title = urllib.unquote(media.filename)
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Stripping Path & Ext From: "%s"' % title)
-
-                title = os.path.basename(title)
-                title = title.rsplit('.', 1)[0]
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Ending Search Title: "%s"' % title)
-
-            title = cleanup(title, self.debug)
-
-        title_is_id = re.match(ID_REGEX, title)
-
-        search_results = []
-        if title:
-            if search_year:
-                search_query = title + ' ' + search_year
-                Log('[TPDB Agent] Searching with Year: "%s"' % search_query)
-            else:
-                search_query = title
-                Log('[TPDB Agent] Searching: "%s"' % search_query)
-
-            if title_is_id:
-                uri = API_SCENE_URL % (urllib.quote(title_is_id.group('id')))
-            else:
-                uri = API_SEARCH_URL % (urllib.quote(search_query), open_hash)
-
-            try:
-                json_obj = GetJSON(uri)
-            except:
-                json_obj = None
-
-            if json_obj:
-                search_results = [json_obj['data']] if title_is_id else json_obj['data']
-
-        if search_results:
-            if self.debug:
-                Log.Debug('[TPDB Agent] Search Results: "%s"' % search_results)
-
-            for idx, search_result in enumerate(search_results):
-                scene_id = search_result['id']
-
-                name = search_result['title']
-                if 'site' in search_result and search_result['site']:
-                    name = '%s %s' % (search_result['site']['name'], search_result['title'])
-
-                date = parse(search_result['date'])
-                year = date.year if date else None
-
-                # If the date is in the search string, remove it
-                title = title.lower()
-                if re.search(r'(\d{4}-\d{2}-\d{2})', title):
-                    title = re.sub(r'\d{4}-\d{2}-\d{2}', '', title)
-
-                title = ' '.join(title.split())
-
-                score = 100 - Util.LevenshteinDistance(title, name.lower())
-                title = string.capwords(title)
-
-                if self.debug:
-                    Log('[TPDB Agent] Found Result: "%s" Site: "%s" (%i)' % (search_result['title'], search_result['site']['name'], score))
-
-                results.Append(MetadataSearchResult(id=scene_id, name=name, year=year, lang='en', score=score))
-
-            results.Sort('score', descending=True)
+        if not manual:
+            results = get_title_results(media, results, manual)
         else:
-            Log.Debug('[TPDB Agent] No results found for: "%s"' % title)
+            log.debug('[TPDB Agent] Adding title search results because this is a manual search')
+            results = get_title_results(media, results, manual)
+
+        results.Sort('score', descending=True)
 
         return results
 
-    def update(self, metadata, media, lang):
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def update(self, metadata, media, lang, force=False):
         uri = API_SCENE_URL % metadata.id
 
         if Prefs['save_to_collection']:
@@ -142,52 +89,64 @@ class ThePornDBScenesAgent(Agent.Movies):
         except:
             json_obj = None
 
-        if json_obj:
-            scene_data = json_obj['data']
-            metadata.content_rating = 'XXX'
+        if not json_obj:
+            return metadata
 
-            metadata.title = scene_data['title']
-            if 'site' in scene_data and scene_data['site']:
-                metadata.studio = scene_data['site']['name']
-            metadata.summary = scene_data['description']
-            # metadata.tagline = scene_data['site']['name']
+        metadata.content_rating = 'XXX'
 
-            date_object = parse(scene_data['date'])
-            if date_object:
-                metadata.originally_available_at = date_object
-                metadata.year = metadata.originally_available_at.year
+        scene_data = json_obj['data']
 
-            if 'trailer' in scene_data and scene_data['trailer']:
-                if Prefs['import_trailer']:
-                    trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(scene_data['trailer'])
-                    trailer = TrailerObject(url=trailer_url, title='Trailer')
+        metadata.title = scene_data['title']
 
-                    if self.debug:
-                        Log.Debug('[TPDB Agent] Adding trailer: %s' % scene_data['trailer'])
+        if 'duration' in scene_data and scene_data['duration'] and int(scene_data['duration']) > 0:
+            metadata.duration = int(scene_data['duration']) * 1000
 
-                    metadata.extras.add(trailer)
+        if 'site' in scene_data and scene_data['site']:
+            metadata.studio = scene_data['site']['name']
+
+        metadata.summary = scene_data['description']
+
+        date_object = parse(scene_data['date'])
+        if date_object:
+            metadata.originally_available_at = date_object
+            metadata.year = metadata.originally_available_at.year
+
+        if 'trailer' in scene_data and scene_data['trailer']:
+            if Prefs['import_trailer']:
+                trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(scene_data['trailer'])
+                trailer = TrailerObject(url=trailer_url, title='Trailer')
+                log.debug('[TPDB Agent] Adding Trailer: %s' % scene_data['trailer'])
+
+                metadata.extras.add(trailer)
+            else:
+                log.debug('[TPDB Agent] Trailer available, but not imported due to user preferences')
+
+        collections = []
+
+        if 'site' in scene_data and scene_data['site']:
+            site_name = scene_data['site']['name']
+
+            # Site Collection
+            if site_name and Prefs['collections_from_site']:
+                site_collection = ''
+
+                if Prefs['collection_site_prefix']:
+                    site_collection = Prefs['collection_site_prefix']
+
+                site_collection += site_name
+
+                log.debug('[TPDB Agent] Queueing Site Collection: "%s"' % site_collection)
+                collections.append(site_collection)
+
+            # Network Collection
+            site_id = scene_data['site']['id']
+            network_id = scene_data['site']['network_id']
+            if network_id and site_id != network_id and Prefs['collections_from_networks']:
+                network_name = ''
+
+                if 'network' in scene_data['site'] and scene_data['site']['network']:
+                    network_name = scene_data['site']['network']['name']
                 else:
-                    Log.Debug('[TPDB Agent] Trailer available, but not imported due to user preferences')
-
-            # Collections
-            metadata.collections.clear()
-            collections = []
-
-            if 'site' in scene_data and scene_data['site']:
-                if Prefs['collections_from_site']:
-                    if Prefs['collection_site_prefix']:
-                        site_collection = Prefs['collection_site_prefix'] + scene_data['site']['name']
-                    else:
-                        site_collection = scene_data['site']['name']
-
-                    if self.debug:
-                        Log.Debug('[TPDB Agent] Writing Site Collection: "%s"' % site_collection)
-
-                    collections.append(site_collection)
-
-                site_id = scene_data['site']['id']
-                network_id = scene_data['site']['network_id']
-                if network_id and site_id != network_id and Prefs['collections_from_networks']:
                     uri = API_SITE_URL % network_id
 
                     try:
@@ -196,105 +155,79 @@ class ThePornDBScenesAgent(Agent.Movies):
                         site_data = None
 
                     if site_data:
-                        site_data = site_data['data']
-                        if Prefs['collection_network_prefix']:
-                            net_collection = Prefs['collection_network_prefix'] + site_data['name']
-                        else:
-                            net_collection = site_data['name']
+                        network_name = site_data['data']['name']
 
-                        if self.debug:
-                            Log.Debug('[TPDB Agent] Writing Network Collection: "%s"' % net_collection)
+                if network_name and network_name != site_name:
+                    net_collection = ''
 
-                        collections.append(net_collection)
+                    if Prefs['collection_network_prefix']:
+                        net_collection = Prefs['collection_network_prefix']
 
-            for collection in collections:
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Adding Collection: "%s"' % collection)
+                    net_collection += network_name
 
-                metadata.collections.add(collection)
+                    log.debug('[TPDB Agent] Queueing Network Collection: "%s"' % net_collection)
+                    collections.append(net_collection)
 
-            # Genres
-            metadata.genres.clear()
-            if 'tags' in scene_data:
-                for tag in scene_data['tags']:
-                    metadata.genres.add(tag['name'])
+        # Genres
+        genres = []
+        if 'tags' in scene_data:
+            for tag in scene_data['tags']:
+                genres.append(tag['name'])
 
-                    if Prefs['create_all_tag_collection_tags']:
-                        if self.debug:
-                            Log.Debug('[TPDB Agent] Adding Tag Collection: "%s"' % tag['name'])
+        metadata.genres.clear()
+        for genre in genres:
+            log.debug('[TPDB Agent] Adding Genre: "%s"' % genre)
+            metadata.genres.add(genre)
 
-                        metadata.collections.add(tag['name'])
+        if Prefs['create_all_tag_collection_tags']:
+            for genre in genres:
+                log.debug('[TPDB Agent] Queueing Tag Collection: "%s"' % genre)
+                collections.append(genre)
 
-            # Actors
-            metadata.roles.clear()
-            for performer in scene_data['performers']:
-                role = metadata.roles.new()
+        # Collections
+        metadata.collections.clear()
+        for collection in collections:
+            log.debug('[TPDB Agent] Adding Collection: "%s"' % collection)
+            metadata.collections.add(collection)
 
-                if 'parent' in performer and performer['parent']:
-                    role.name = performer['parent']['name']
-                else:
-                    role.name = performer['name']
+        # Actors
+        metadata.roles.clear()
+        for performer in scene_data['performers']:
+            role = metadata.roles.new()
 
-                role.role = performer['name']
-                role.photo = performer['face']
+            if 'parent' in performer and performer['parent']:
+                role.name = performer['parent']['name']
+            else:
+                role.name = performer['name']
 
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Adding actor: "%s"' % role.name)
+            role.role = performer['name']
+            role.photo = performer['face']
 
-            if Prefs['custom_title_enable']:
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Using custom naming format: "%s"' % Prefs['custom_title'])
+            log.debug('[TPDB Agent] Adding Actor: "%s": "%s"' % (role.name, role.photo))
 
-                data = {
-                    'title': metadata.title,
-                    'actors': ', '.join([actor.name.encode('ascii', 'ignore') for actor in metadata.roles]),
-                    'studio': metadata.studio,
-                    'series': ', '.join(set([collection.encode('ascii', 'ignore') for collection in metadata.collections if collection not in metadata.studio])),
-                }
-                metadata.title = Prefs['custom_title'].format(**data)
+        if Prefs['custom_title_enable']:
+            log.debug('[TPDB Agent] Using custom naming format: "%s"' % Prefs['custom_title'])
 
-                if self.debug:
-                    Log.Debug('[TPDB Agent] Resulting Title: "%s"' % metadata.title)
+            data = {
+                'title': metadata.title,
+                'actors': ', '.join([actor.name.encode('ascii', 'ignore') for actor in metadata.roles]),
+                'studio': metadata.studio,
+                'series': ', '.join(set([collection.encode('ascii', 'ignore') for collection in metadata.collections if collection not in metadata.studio])),
+            }
+            metadata.title = Prefs['custom_title'].format(**data)
 
-            poster = scene_data['posters']['large']
-            try:
-                metadata.posters[poster] = Proxy.Media(HTTP.Request(poster).content)
-            except:
-                Log.Debug('[TPDB Agent] Unable to retrieve poster image from TPDB: "%s"' % poster)
+            log.debug('[TPDB Agent] Resulting Title: "%s"' % metadata.title)
 
-            background = scene_data['background']['full']
-            try:
-                metadata.art[background] = Proxy.Media(HTTP.Request(background).content)
-            except:
-                Log.Debug('[TPDB Agent] Unable to retrieve background image from TPDB: "%s"' % background)
+        poster = scene_data['posters']['large']
+        try:
+            metadata.posters[poster] = Proxy.Media(HTTP.Request(poster).content)
+        except:
+            log.error('[TPDB Agent] Failed to retrieve poster image: "%s"' % poster)
+
+        background = scene_data['background']['full']
+        try:
+            metadata.art[background] = Proxy.Media(HTTP.Request(background).content)
+        except:
+            log.error('[TPDB Agent] Failed to retrieve background image: "%s"' % background)
 
         return metadata
-
-
-def cleanup(text, debug=False):
-    text = urllib.unquote(text)
-    if debug:
-        Log.Debug('[TPDB Agent] Cleanup text: "%s"' % text)
-
-    if Prefs['filepath_cleanup_enable'] and Prefs['filepath_cleanup']:
-        replace_text = Prefs['filepath_replace']
-        if not replace_text:
-            replace_text = ''
-        substrings = Prefs['filepath_cleanup'].split(',')
-
-        if debug:
-            Log.Debug('[TPDB Agent] Substitute string: "%s"' % Prefs['filepath_cleanup'])
-
-        if debug:
-            Log.Debug('[TPDB Agent] Substitute Title Text: "%s"' % text)
-
-        for substring in substrings:
-            Log.Debug('[TPDB Agent] Substitution Instance: "%s"' % substring)
-            text = re.sub(substring, replace_text, text, re.IGNORECASE)
-
-        text = ' '.join(text.split())
-
-    if debug:
-        Log.Debug('[TPDB Agent] Cleaned Title: "%s"' % text)
-
-    return text

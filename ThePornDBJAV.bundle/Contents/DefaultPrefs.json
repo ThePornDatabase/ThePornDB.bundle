@@ -21,7 +21,7 @@
         "id": "collection_site_prefix",
         "label": "Prefix to Prepend to Site Name for Collections (Blank to Disable)",
         "type": "text",
-        "default": "Site: "
+        "default": ""
     },
     {
         "id": "create_all_tag_collection_tags",
@@ -33,7 +33,7 @@
         "id": "collection_network_prefix",
         "label": "Prefix to Prepend to Network Name for Collections (Blank to Disable)",
         "type": "text",
-        "default": "Network: "
+        "default": ""
     },
     {
         "id": "custom_title_enable",
@@ -58,7 +58,8 @@
         "label": "Use Filename for search, will ignore the current title assigned in Plex",
         "type": "bool",
         "default": "false"
-    },    {
+    },
+    {
         "id": "filepath_strip_path_enable",
         "label": "Strip file path and extension from searched filepath.  (Only for searching by filename)",
         "type": "bool",
@@ -95,9 +96,10 @@
         "default": "false"
     },
     {
-        "id": "debug_logging",
-        "label": "Enable Debug logging",
-        "type": "bool",
-        "default": "false"
+        "id": "logging_level",
+        "label": "Level of plugin logging",
+        "type": "enum",
+        "values": ["DEBUG", "INFO", "WARN", "ERROR"],
+        "default": "INFO"
     }
 ]
