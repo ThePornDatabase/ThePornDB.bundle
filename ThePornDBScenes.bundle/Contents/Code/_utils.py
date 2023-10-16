@@ -30,7 +30,10 @@ API_SCENE_URL = API_BASE_URL + '/scenes/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
 API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=true'
 
-ID_REGEX = r'(:?.*https\:\/\/api\.metadataapi\.net\/scenes\/)?(?P<id>[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12})'
+ID_REGEXES = [
+    r'\[theporndbid=(?P<id>.*)\]',
+    r'^https://(?:api\.)?metadataapi\.net/scenes/(?P<id>.*)$',
+]
 
 
 def json_decode(output):
@@ -56,6 +59,7 @@ def make_request(url, headers):
     sleep_time = 1
     num_retries = 4
     for x in range(0, num_retries):
+        log.debug('Requesting GET "%s"' % url)
         try:
             response = HTTP.Request(url, headers=headers, timeout=90, sleep=sleep_time)
         except Exception as str_error:
@@ -128,8 +132,7 @@ def process_search_result(title, search_result, is_id_match):
     else:
         score = 100
 
-    log.info('[TPDB Agent] Found Result: "%s" Site: "%s" (%i)' % (
-        search_result['title'], search_result['site']['name'], score))
+    log.info('[TPDB Agent] Found Result: "%s" Site: "%s" (%i)' % (search_result['title'], search_result['site']['name'], score))
 
     return MetadataSearchResult(id=scene_id, name=name, year=year, lang='en', score=score)
 
@@ -168,7 +171,12 @@ def get_title_results(media, results, manual):
         search_query = title
         log.info('[TPDB Agent] Searching: "%s"' % search_query)
 
-    title_is_id = re.match(ID_REGEX, title)
+    title_is_id = None
+    for regex in ID_REGEXES:
+        title_is_id = re.search(regex, title)
+        if title_is_id:
+            break
+
     if title_is_id:
         uri = API_SCENE_URL % (urllib.quote(title_is_id.group('id')))
     else:
@@ -190,6 +198,6 @@ def get_title_results(media, results, manual):
     log.debug('[TPDB Agent] Search Results: "%s"' % search_results)
 
     for _, search_result in enumerate(search_results):
-        results.Append(process_search_result(title, search_result, False))
+        results.Append(process_search_result(title, search_result, title_is_id))
 
     return results
