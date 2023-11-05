@@ -4,6 +4,7 @@ import os
 import re
 import time
 import json
+import traceback
 import urllib
 from dateutil.parser import parse
 
@@ -59,12 +60,12 @@ def make_request(url, headers):
     sleep_time = 1
     num_retries = 4
     for x in range(0, num_retries):
-        log.debug('Requesting GET "%s"' % url)
+        log.debug('[TPDB Agent] Requesting GET "%s"' % url)
         try:
             response = HTTP.Request(url, headers=headers, timeout=90, sleep=sleep_time)
         except Exception as str_error:
-            log.error('Failed HTTP Request Attempt #%d: %s' % (x, url))
-            log.error(str_error)
+            log.error('[TPDB Agent] Failed HTTP Request Attempt #%d: %s' % (x, url))
+            log.error('[TPDB Agent] %s' % str_error)
 
         if str_error:
             time.sleep(sleep_time)
@@ -184,11 +185,16 @@ def get_title_results(media, results, manual):
 
     try:
         json_obj = GetJSON(uri)
-    except:
-        log.error('[TPDB Agent] Failed to fetch search results: "%s"' % uri)
+    except Exception as e:
         json_obj = None
+        log.error('[TPDB Agent] Failed to fetch search results: "%s"' % uri)
+        log.error('[TPDB Agent] %s: %s' % (e, traceback.format_exc()))
 
     if not json_obj:
+        return results
+
+    if 'error' in json_obj and json_obj['error']:
+        log.error('[TPDB Agent] Server error: %s' % json_obj['error'])
         return results
 
     search_results = [json_obj['data']] if title_is_id else json_obj['data']
@@ -197,7 +203,7 @@ def get_title_results(media, results, manual):
 
     log.debug('[TPDB Agent] Search Results: "%s"' % search_results)
 
-    for _, search_result in enumerate(search_results):
+    for search_result in search_results:
         results.Append(process_search_result(title, search_result, title_is_id))
 
     return results
