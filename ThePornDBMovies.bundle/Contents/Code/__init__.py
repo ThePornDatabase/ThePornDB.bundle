@@ -4,7 +4,7 @@
 import base64
 from dateutil.parser import parse
 
-from _utils import GetJSON, get_title_results, API_SCENE_URL, API_SITE_URL, API_ADD_TO_COLLECTION_QS_SUFFIX
+from _utils import GetJSON, get_title_results, API_SCENE_URL, API_SITE_URL, API_ADD_TO_COLLECTION_QS_SUFFIX, make_request
 from _logging import log
 
 # plex debugging
@@ -220,13 +220,13 @@ class ThePornDBMoviesAgent(Agent.Movies):
 
         poster = scene_data['posters']['large']
         try:
-            metadata.posters[poster] = Proxy.Media(HTTP.Request(poster).content)
+            metadata.posters[poster] = Proxy.Media(make_request(poster))
         except:
             log.error('[TPDB Agent] Failed to retrieve poster image: "%s"' % poster)
 
         background = scene_data['background']['full']
         try:
-            metadata.art[background] = Proxy.Media(HTTP.Request(background).content)
+            metadata.art[background] = Proxy.Media(make_request(background))
         except:
             log.error('[TPDB Agent] Failed to retrieve background image: "%s"' % background)
 

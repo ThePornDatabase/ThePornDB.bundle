@@ -8,6 +8,8 @@ import traceback
 import urllib
 from dateutil.parser import parse
 
+import requests
+
 from _logging import log
 
 # plex debugging
@@ -47,7 +49,7 @@ def json_decode(output):
         return None
 
 
-def make_request(url, headers):
+def make_request(url, headers={}):
     """
         Makes and returns an HTTP request.
         Retries 4 times, increasing  time between each retry.
@@ -62,7 +64,7 @@ def make_request(url, headers):
     for x in range(0, num_retries):
         log.debug('[TPDB Agent] Requesting GET "%s"' % url)
         try:
-            response = HTTP.Request(url, headers=headers, timeout=90, sleep=sleep_time)
+            response = requests.get(url, headers=headers, timeout=90, verify=False)
         except Exception as str_error:
             log.error('[TPDB Agent] Failed HTTP Request Attempt #%d: %s' % (x, url))
             log.error('[TPDB Agent] %s' % str_error)
