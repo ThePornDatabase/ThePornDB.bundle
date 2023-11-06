@@ -71,7 +71,7 @@ def make_request(url, headers={}):
 
         if str_error:
             time.sleep(sleep_time)
-            sleep_time *= x
+            sleep_time = sleep_time * x
         else:
             break
 
