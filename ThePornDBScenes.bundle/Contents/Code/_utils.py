@@ -146,16 +146,16 @@ def get_title_results(media, results, manual):
     if media.items[0].parts[0].openSubtitleHash and Prefs['oshash_matching_enable']:
         open_hash = media.items[0].parts[0].openSubtitleHash
 
-    title = media.name if media.name else media.title
+    title = media.name
     search_year = str(media.year) if media.year else ''
 
     log.debug('[TPDB Agent] Plex Title (Not Filename): "%s"' % title)
 
     if (not manual or not title) and media.filename and Prefs['match_by_filepath_enable']:
-        if Prefs['filepath_strip_path_enable']:
-            log.debug('[TPDB Agent] Using Filename to Search')
+        log.debug('[TPDB Agent] Using Filename to Search')
 
-            title = urllib.unquote(media.filename)
+        title = urllib.unquote(media.filename)
+        if Prefs['filepath_strip_path_enable']:
             log.debug('[TPDB Agent] Stripping Path & Ext From: "%s"' % title)
 
             title = os.path.basename(title)
