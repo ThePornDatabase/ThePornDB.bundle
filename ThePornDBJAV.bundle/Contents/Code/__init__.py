@@ -111,18 +111,7 @@ class ThePornDBJAVAgent(Agent.Movies):
             metadata.originally_available_at = date_object
             metadata.year = metadata.originally_available_at.year
 
-        if 'trailer' in scene_data and scene_data['trailer']:
-            if Prefs['import_trailer']:
-                trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(scene_data['trailer'])
-                trailer = TrailerObject(url=trailer_url, title='Trailer')
-                log.debug('[TPDB Agent] Adding Trailer: %s' % scene_data['trailer'])
-
-                metadata.extras.add(trailer)
-            else:
-                log.debug('[TPDB Agent] Trailer available, but not imported due to user preferences')
-
         collections = []
-
         if 'site' in scene_data and scene_data['site']:
             site_name = scene_data['site']['name']
 
@@ -219,15 +208,27 @@ class ThePornDBJAVAgent(Agent.Movies):
             log.debug('[TPDB Agent] Resulting Title: "%s"' % metadata.title)
 
         poster = scene_data['posters']['large']
-        try:
-            metadata.posters[poster] = Proxy.Media(make_request(poster))
-        except:
-            log.error('[TPDB Agent] Failed to retrieve poster image: "%s"' % poster)
+        if poster:
+            try:
+                metadata.posters[poster] = Proxy.Media(make_request(poster))
+            except:
+                log.error('[TPDB Agent] Failed to retrieve poster image: "%s"' % poster)
 
         background = scene_data['background']['full']
-        try:
-            metadata.art[background] = Proxy.Media(make_request(background))
-        except:
-            log.error('[TPDB Agent] Failed to retrieve background image: "%s"' % background)
+        if background:
+            try:
+                metadata.art[background] = Proxy.Media(make_request(background))
+            except:
+                log.error('[TPDB Agent] Failed to retrieve background image: "%s"' % background)
+
+        if 'trailer' in scene_data and scene_data['trailer']:
+            if Prefs['import_trailer']:
+                trailer_url = 'tpdb://trailer/' + base64.urlsafe_b64encode(scene_data['trailer'])
+                trailer = TrailerObject(url=trailer_url, title='Trailer', thumb=background)
+                log.debug('[TPDB Agent] Adding Trailer: %s' % scene_data['trailer'])
+
+                metadata.extras.add(trailer)
+            else:
+                log.debug('[TPDB Agent] Trailer available, but not imported due to user preferences')
 
         return metadata
