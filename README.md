@@ -92,12 +92,12 @@ See the [open issues](https://github.com/ThePornDatabase/ThePornDB.bundle/issues
 
 <!-- CONTRIBUTING -->
 ## Contributing
-- Join the [Discord](https://discord.gg/XpSGpaB) server and collaborate
-- [Donate](https://www.patreon.com/metadataapi/posts) to the project
+- Join the [Discord](https://theporndb.net/discord) server and collaborate
+- [Donate](https://theporndb.net/donate) to the project
 
 <!-- CONTACT -->
 ## Contact
-Contact us on [Discord](https://discord.gg/VnD6KJqF)
+Contact us on [Discord](https://theporndb.net/discord)
 
 
 
