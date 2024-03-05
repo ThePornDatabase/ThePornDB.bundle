@@ -5,7 +5,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/ThePornDatabase/ThePornDB.bundle">
-    <img src="https://metadataapi.net/images/logo.png" alt="Logo" width="200" height="100">
+    <img src="https://theporndb.net/images/logo.png" alt="Logo" width="200" height="100">
   </a>
 
   <h3 align="center">Plex Metadata Plug-In</h3>
@@ -58,7 +58,7 @@
 ### Prerequisites
 - You must know the location and have access to the Plex Plug-Ins folder. If you need help finding it go [here](https://support.plex.tv/articles/201106098-how-do-i-find-the-plug-ins-folder/)
 - You need to have a basic understanding of how to download from git and unzip files to your OS.
-- You should have obtained an API Token from [ThePornDB](https://metadataapi.net/)
+- You should have obtained an API Token from [ThePornDB](https://theporndb.net/)
 
 ### Installation
 - Download, unzip, and rename the Plug-In. If you need help follow [these](https://support.plex.tv/articles/201187656-how-do-i-manually-install-a-plugin/) instructions

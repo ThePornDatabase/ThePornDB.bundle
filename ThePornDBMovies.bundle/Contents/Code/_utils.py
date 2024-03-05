@@ -27,7 +27,7 @@ else:  # the code is running outside of Plex
     from plexhints.util_kit import Util  # util kit
 
 
-API_BASE_URL = 'https://api.metadataapi.net'
+API_BASE_URL = 'https://api.theporndb.net'
 API_SEARCH_URL = API_BASE_URL + '/movies?parse=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/movies/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
