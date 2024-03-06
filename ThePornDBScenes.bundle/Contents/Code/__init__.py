@@ -186,11 +186,12 @@ class ThePornDBScenesAgent(Agent.Movies):
 
             if 'parent' in performer and performer['parent']:
                 role.name = performer['parent']['name']
+                role.photo = performer['parent']['face']
             else:
                 role.name = performer['name']
+                role.photo = performer['face']
 
             role.role = performer['name']
-            role.photo = performer['face']
 
             log.debug('[TPDB Agent] Adding Actor: "%s": "%s"' % (role.name, role.photo))
 
