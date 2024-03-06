@@ -126,8 +126,8 @@ def process_search_result(title, search_result, is_id_match):
     if not is_id_match:
         # If the date is in the search string, remove it
         title = title.lower()
-        if re.search(r'(\d{4}-\d{2}-\d{2})', title):
-            title = re.sub(r'\d{4}-\d{2}-\d{2}', '', title)
+        if re.search(r'(\d{4}[- ]\d{2}[- ]\d{2})', title):
+            title = re.sub(r'\d{4}[- ]\d{2}[- ]\d{2}', '', title)
 
         title = ' '.join(title.split())
 
