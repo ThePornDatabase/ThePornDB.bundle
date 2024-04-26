@@ -113,7 +113,7 @@ def cleanup(text):
     return text
 
 
-def process_search_result(title, search_result, is_id_match):
+def process_search_result(title, search_result, is_id_match, idx):
     scene_id = search_result['id']
 
     name = search_result['title']
@@ -122,18 +122,22 @@ def process_search_result(title, search_result, is_id_match):
 
     date = parse(search_result['date'])
     year = date.year if date else None
+    score = 0
 
-    if not is_id_match:
-        # If the date is in the search string, remove it
-        title = title.lower()
-        if re.search(r'(\d{4}[- ]\d{2}[- ]\d{2})', title):
-            title = re.sub(r'\d{4}[- ]\d{2}[- ]\d{2}', '', title)
-
-        title = ' '.join(title.split())
-
-        score = 100 - Util.LevenshteinDistance(title, name.lower())
-    else:
+    if is_id_match:
         score = 100
+    elif Prefs['score_method'] == 'default':
+        score = 100 - idx
+    elif Prefs['score_method'] == 'custom':
+        title = ' '.join(title.split())
+        data = {
+            'title': search_result['title'],
+            'site': search_result['site']['name'] if 'site' in search_result and search_result['site'] else '',
+            'date': search_result['date'],
+        }
+        name_score = Prefs['custom_score'].format(**data)
+
+        score = 100 - Util.LevenshteinDistance(title.lower(), name_score.lower())
 
     log.info('[TPDB Agent] Found Result: "%s" Site: "%s" (%i)' % (search_result['title'], search_result['site']['name'], score))
 
@@ -205,7 +209,7 @@ def get_title_results(media, results, manual):
 
     log.debug('[TPDB Agent] Search Results: "%s"' % search_results)
 
-    for search_result in search_results:
-        results.Append(process_search_result(title, search_result, title_is_id))
+    for idx, search_result in enumerate(search_results):
+        results.Append(process_search_result(title, search_result, title_is_id, idx))
 
     return results

@@ -48,6 +48,22 @@
         "type": "text",
         "default": "{actors} - {title} [{studio}/{series}]"
     },
+        {
+        "id": "score_method",
+        "label": "Score Method",
+        "type": "enum",
+        "values": [
+            "default",
+            "custom"
+        ],
+        "default": "custom"
+    },
+	{
+        "id": "custom_score",
+        "label": "Your name format (Tags Available: {title}, {site}, {date})",
+        "type": "text",
+        "default": "{site} {date} {title}"
+    },
     {
         "id": "oshash_matching_enable",
         "label": "Use Matching by OpenSubtitleHash (Matches against file OSHASH)",
