@@ -9,6 +9,7 @@ import urllib
 from dateutil.parser import parse
 
 import requests
+import urllib3
 
 from _logging import log
 
@@ -26,6 +27,7 @@ else:  # the code is running outside of Plex
     from plexhints.parse_kit import JSON, XML  # parse kit
     from plexhints.util_kit import Util  # util kit
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_BASE_URL = 'https://api.theporndb.net'
 API_SEARCH_URL = API_BASE_URL + '/movies?parse=%s&hash=%s'
