@@ -36,7 +36,7 @@ API_SITE_URL = API_BASE_URL + '/sites/%s'
 API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=true'
 
 ID_REGEXES = [
-    r'\[theporndbid=(?P<id>.*)\]',
+    r'\[(theporndbid|TPDBID)=(?P<id>.*)\]',
     r'^https://(?:api\.)?theporndb\.net/jav/(?P<id>.*)$',
 ]
 
