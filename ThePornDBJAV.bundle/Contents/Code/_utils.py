@@ -33,7 +33,7 @@ API_BASE_URL = 'https://api.theporndb.net'
 API_SEARCH_URL = API_BASE_URL + '/jav?parse=%s&hash=%s'
 API_SCENE_URL = API_BASE_URL + '/jav/%s'
 API_SITE_URL = API_BASE_URL + '/sites/%s'
-API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=true'
+API_ADD_TO_COLLECTION_QS_SUFFIX = '?add_to_collection=1'
 
 ID_REGEXES = [
     r'\[(theporndbid|TPDBID)=(?P<id>.*)\]',
