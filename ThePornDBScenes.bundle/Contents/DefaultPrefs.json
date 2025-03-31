@@ -34,7 +34,7 @@
         "id": "create_all_tag_collection_tags",
         "label": "Create Collections from ALL Tags/Genres",
         "type": "bool",
-        "default": false
+        "default": "false"
     },
     {
         "id": "collection_parent_prefix",
