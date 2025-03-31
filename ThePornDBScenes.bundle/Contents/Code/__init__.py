@@ -127,8 +127,38 @@ class ThePornDBScenesAgent(Agent.Movies):
                 log.debug('[TPDB Agent] Queueing Site Collection: "%s"' % site_collection)
                 collections.append(site_collection)
 
-            # Network Collection
             site_id = scene_data['site']['id']
+
+            # Parent Collection
+            parent_id = scene_data['site']['network_id']
+            if parent_id and site_id != parent_id and Prefs['collections_from_parents']:
+                parent_name = ''
+
+                if 'parent' in scene_data['site'] and scene_data['site']['parent']:
+                    parent_name = scene_data['site']['parent']['name']
+                else:
+                    uri = API_SITE_URL % parent_id
+
+                    try:
+                        site_data = GetJSON(uri)
+                    except:
+                        site_data = None
+
+                    if site_data:
+                        parent_name = site_data['data']['name']
+
+                if parent_name and parent_name != site_name:
+                    net_collection = ''
+
+                    if Prefs['collection_parent_prefix']:
+                        net_collection = Prefs['collection_parent_prefix']
+
+                    net_collection += parent_name
+
+                    log.debug('[TPDB Agent] Queueing Parent Collection: "%s"' % net_collection)
+                    collections.append(net_collection)
+
+            # Network Collection
             network_id = scene_data['site']['network_id']
             if network_id and site_id != network_id and Prefs['collections_from_networks']:
                 network_name = ''

@@ -13,6 +13,12 @@
         "default": "true"
     },
     {
+        "id": "collections_from_parents",
+        "label": "Create Collection for Parent Name",
+        "type": "bool",
+        "default": "true"
+    },
+    {
         "id": "collections_from_networks",
         "label": "Create Collection for Network Name",
         "type": "bool",
@@ -29,6 +35,12 @@
         "label": "Create Collections from ALL Tags/Genres",
         "type": "bool",
         "default": false
+    },
+    {
+        "id": "collection_parent_prefix",
+        "label": "Prefix to Prepend to Parent Name for Collections (Blank to Disable)",
+        "type": "text",
+        "default": ""
     },
     {
         "id": "collection_network_prefix",
