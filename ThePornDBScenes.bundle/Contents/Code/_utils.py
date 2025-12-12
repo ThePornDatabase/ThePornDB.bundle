@@ -47,7 +47,7 @@ def json_decode(output):
     """
     try:
         return json.loads(output, encoding='UTF-8')
-    except AttributeError:
+    except Exception:
         return None
 
 
@@ -77,7 +77,7 @@ def make_request(url, headers={}):
         else:
             break
 
-    return response.content if response else response
+    return response.content if response and response.ok else None
 
 
 def GetJSON(url):
@@ -88,7 +88,9 @@ def GetJSON(url):
     if Prefs['personal_api_key']:
         headers['Authorization'] = 'Bearer %s' % Prefs['personal_api_key']
 
-    return json_decode(make_request(url, headers))
+    response = make_request(url, headers)
+
+    return json_decode(response) if response else None
 
 
 def cleanup(text):
